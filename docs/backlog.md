@@ -12,3 +12,4 @@ Ranked. Pick up only once the MVP is live (decision log D17).
 | B6 | Extract more order fields (HCPCS items, diagnosis codes, order date) | Fuller intake | 30 min |
 | B7 | Move extraction to Bedrock under an AWS BAA, plus BAA-covered hosting | Production PHI (see `decisions/2026-11-04-hipaa-posture.md`) | 1 day |
 | B8 | Persistent rate limiting (Redis) | The in-memory limiter resets per replica | 20 min |
+| B9 | PDF preview pane (former M5), web-only on top of `GET /orders/{id}/document` | Cut at the 13:50 re-plan for time | 30 min |

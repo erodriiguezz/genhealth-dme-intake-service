@@ -1,6 +1,6 @@
 # Architecture
 
-How the order-intake service is built and why. The decisions behind each choice are ADRs in `docs/context/decisions/`. The table schemas are in [data-schema.md](data-schema.md), and the endpoint contracts are in [api.md](api.md).
+How the order-intake service is built and why. The decisions behind each choice are ADRs in `docs/context/decisions/`. The table schemas are in [schema.md](schema.md), and the endpoint contracts are in [api.md](api.md).
 
 ## 1. Context
 
@@ -70,7 +70,7 @@ services/api/
     extraction/{base,anthropic_extractor,fake,prompt,schema,grounding}.py
   alembic/
   tests/
-apps/web/src/
+apps/web/
   app/(auth)/{login,signup}/  app/orders/{,new,[id]}/
   components/  lib/{api,api-types,auth}.ts
 evals/   e2e/   docs/

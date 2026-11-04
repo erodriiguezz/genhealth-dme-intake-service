@@ -2,7 +2,7 @@
 
 | Piece | Choice |
 | --- | --- |
-| Repo | Monorepo: `apps/web` (Next.js 15, TS, pnpm), `services/api` (FastAPI, Python 3.12, uv), root `Makefile` |
+| Repo | Monorepo: `apps/web` (Next.js 16, TS, pnpm), `services/api` (FastAPI, Python 3.12, uv), root `Makefile` |
 | API | FastAPI + Pydantic v2, SQLAlchemy 2 + Alembic, uvicorn |
 | DB | Postgres 16. Local via docker compose, prod via the Railway plugin. Tables `users`, `orders`, `documents` |
 | PDF storage | `documents.content` bytea, served only via an authenticated `GET /orders/{id}/document` |

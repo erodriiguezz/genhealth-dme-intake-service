@@ -2,9 +2,9 @@
 issue: M4
 title: "Web workflow UI: auth, orders list, upload and review, manual CRUD"
 branch: feat/dme-order-intake-p4-web-ui
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Ernesto
+approved_at: 2026-11-04
 autonomy: pr
 source: mvp
 mvp: mvp-order-intake
@@ -37,12 +37,12 @@ The builder follows the `design` skill and `docs/context/designs/ui.md`. Turned 
 **Blast radius**
 - Touches: web only
 - Files to touch:
-  - `apps/web/src/lib/{api.ts,api-types.ts,auth.tsx}`
-  - `apps/web/src/app/{layout.tsx,page.tsx}`: `/` redirects to `/orders` or `/login`
-  - `apps/web/src/app/(auth)/{login,signup}/page.tsx`
-  - `apps/web/src/app/orders/{page.tsx,new/page.tsx,[id]/page.tsx}`
-  - `apps/web/src/components/{order-form,issue-list,status-badge,upload-dropzone,orders-table,app-header,phi-banner}.tsx`
-  - `apps/web/src/components/ui/*`: shadcn
+  - `apps/web/lib/{api.ts,api-types.ts,auth.tsx}`
+  - `apps/web/app/{layout.tsx,page.tsx}`: `/` redirects to `/orders` or `/login`
+  - `apps/web/app/(auth)/{login,signup}/page.tsx`
+  - `apps/web/app/orders/{page.tsx,new/page.tsx,[id]/page.tsx}`
+  - `apps/web/components/{order-form,issue-list,status-badge,upload-dropzone,orders-table,app-header,phi-banner}.tsx`
+  - `apps/web/components/ui/*`: shadcn
   - `apps/web/next.config.ts`: CSP headers
   - `e2e/{auth,orders,upload}.spec.ts`
   - `apps/web/package.json`: `gen:api` script
@@ -75,6 +75,17 @@ The builder follows the `design` skill and `docs/context/designs/ui.md`. Turned 
 **Context:** none
 
 ---
+### Builds on M1 (actual state @ 0189312), lane C, wave 1
+- Branch `feat/dme-order-intake-p4-web-ui` from M1 head (0189312), in parallel with M2/M3a.
+- **Next.js 16.4, not 15.** Before writing code, read `apps/web/AGENTS.md` and the relevant guides in `apps/web/node_modules/next/dist/docs/`. No `src/` dir: routes live in `apps/web/app/`, components in `apps/web/components/`, utils in `apps/web/lib/`.
+- shadcn is initialized on **@base-ui/react** (see `components.json`). Add components with the shadcn CLI, not by hand-copying Radix variants.
+- Build every screen against `docs/architecture/api.md`. Write the typed client in `lib/api.ts` from that contract first, then regenerate it with `openapi-typescript` once M2/M3b merge, and fix any drift.
+- Wave 2: rebase on the feature branch and run Playwright against the local API with `EXTRACTION_PROVIDER=fake`.
+- Production: CORS already allows https://genhealth-dme-intake.vercel.app. `NEXT_PUBLIC_API_URL` is set on Vercel.
+- Design source: the signed-off prototype (D27) and the tokens in `docs/context/designs/ui.md`. **No PDF pane** (M5 cut). Use the prototype's single form column, keeping the page chips as plain text labels.
+- First task: replace the unvetted `cn` npm dependency (`lib/utils.ts` re-exports `cn` from the package `cn@^0.5.2`) with the standard shadcn helper built on `clsx` + `tailwind-merge`, and remove `cn` from `package.json`. Commit: `fix: replace cn package with clsx and tailwind-merge`.
+- **Don't touch** `services/**`.
+
 ## 3. Design & architecture
 Design source: **the signed-off prototype** (Claude artifact https://claude.ai/artifact/SqXMdtrkFR3SBXVDuTwSM5, copy in `docs/context/designs/prototype/`: `Main.dc.html` flow, `States.dc.html` edge states) plus `docs/context/designs/ui.md`. Match its layout, copy, tokens and states. M4 can't start until the human has signed off the prototype (decision log). Fake mode: the API's `EXTRACTION_PROVIDER=fake` returns the benchmark values. It is only allowed when `ENV != production`, and the API refuses to start otherwise.
 

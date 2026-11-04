@@ -2,11 +2,11 @@
 -- DME order-intake service: full database schema (PostgreSQL 16)
 --
 -- This is the reviewable source of truth for the data model. Alembic migration
--- 0001 (services/api/alembic/versions/0001_initial.py) must produce exactly this
+-- 0002 (services/api/alembic/versions/0002_initial_schema.py) must produce exactly this
 -- schema. CI-free check: `make schema-diff` dumps the migrated DB with
 -- `pg_dump --schema-only` and diffs it against this file (added in M2).
 --
--- Companion docs: data-schema.md (rationale, JSON shapes, issue codes),
+-- Companion docs: schema.md (rationale, JSON shapes, issue codes),
 -- api.md (how each column surfaces in the API).
 --
 -- Conventions
@@ -163,7 +163,7 @@ CREATE TRIGGER orders_set_updated_at
 
 COMMENT ON TABLE  orders            IS 'DME orders. Owner-scoped. Status derived from issues.';
 COMMENT ON COLUMN orders.status     IS 'Derived server-side. ready iff 5 fields non-null and no error issue.';
-COMMENT ON COLUMN orders.issues     IS 'Array of {field, code, severity: error|warning, message, source: validation|extraction}. See data-schema.md.';
+COMMENT ON COLUMN orders.issues     IS 'Array of {field, code, severity: error|warning, message, source: validation|extraction}. See schema.md.';
 COMMENT ON COLUMN orders.extraction IS 'Extractor provenance: model, prompt_version, latency, tokens, per-field {raw, evidence, page, grounded}, provider_candidates.';
 
 COMMIT;

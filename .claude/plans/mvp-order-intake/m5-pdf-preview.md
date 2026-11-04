@@ -2,9 +2,9 @@
 issue: M5
 title: PDF preview pane on the review screen
 branch: feat/dme-order-intake-p5-pdf-preview
-status: draft
-approved_by:
-approved_at:
+status: cut
+approved_by: Ernesto
+approved_at: 2026-11-04
 autonomy: pr
 source: mvp
 mvp: mvp-order-intake
@@ -38,9 +38,9 @@ Turned down: `<iframe src>` (can't send the auth header or control the page).
 **Blast radius**
 - Touches: web review screen only
 - Files to touch:
-  - `apps/web/src/components/pdf-preview.tsx`
-  - `apps/web/src/app/orders/[id]/page.tsx`
-  - `apps/web/src/components/issue-list.tsx`: page chip becomes a button
+  - `apps/web/components/pdf-preview.tsx`
+  - `apps/web/app/orders/[id]/page.tsx`
+  - `apps/web/components/issue-list.tsx`: page chip becomes a button
   - `apps/web/next.config.ts`: pdf.js worker, CSP `worker-src blob:`
   - `e2e/preview.spec.ts`
   - `apps/web/package.json`
@@ -65,6 +65,9 @@ Turned down: `<iframe src>` (can't send the auth header or control the page).
 **Out of scope:** highlighting the evidence text inside the PDF
 
 **Context:** none
+
+### Status: CUT at re-plan (13:50)
+The 14:30 cut line falls inside wave 2, so this milestone isn't built for the assessment. It's backlog B9. The stored PDF remains available via `GET /orders/{id}/document` (M3b), so adding the pane later is web-only.
 
 ## 3. Design & architecture
 Design source: `docs/context/designs/ui.md`, review wireframe (left pane).

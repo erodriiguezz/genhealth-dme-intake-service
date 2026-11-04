@@ -9,3 +9,5 @@
 | 2026-11-04 12:41 | MVP plan, 6 milestone plans, 9 ADRs, UI design and context written. Awaiting approval |
 | 2026-11-04 12:59 | Change requests applied (task commits, architecture docs, prototype, GenHealth-inspired styling). Plan re-rendered for approval |
 | 2026-11-04 13:11 | Pre-flight done (human). UI prototype approved. Human asked for a full schema file to review |
+| 2026-11-04 13:49 | M1 in PR #1 (live). Plans reconciled with M1. Re-planned into parallel lanes, M5 cut |
+| 2026-11-04 13:52 | Approved and deliver. Wave 1 (M2, M3a, M4) launching |

@@ -2,9 +2,9 @@
 issue: M2
 title: Users, auth, seeded reviewers and owner-scoped Order CRUD with validation
 branch: feat/dme-order-intake-p2-data-auth
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Ernesto
+approved_at: 2026-11-04
 autonomy: pr
 source: mvp
 mvp: mvp-order-intake
@@ -32,7 +32,7 @@ queue: false
 - Touches: API only
 - Files to touch:
   - `app/models.py`: User, Document, Order, matching `docs/architecture/schema.sql` (the human-reviewed DDL)
-  - `alembic/versions/0001_initial.py`
+  - `alembic/versions/0002_initial_schema.py`
   - `app/security.py`: argon2id (argon2-cffi), JWT (PyJWT), `get_current_user` dependency
   - `app/routers/auth.py`: register, login (OAuth2 form), me
   - `app/routers/orders.py`: list (`status` filter, limit/offset), create, get, patch, delete
@@ -74,6 +74,15 @@ queue: false
 ---
 ## 2. Grill
 See `docs/process/grill-log.md`. Seeded reviewers: decision log D20.
+
+### Builds on M1 (actual state @ 0189312)
+- **Lane A, wave 1.** Branch `feat/dme-order-intake-p2-data-auth` from `feat/dme-order-intake-p1-scaffold` (0189312). PR base: `feat/dme-order-intake` (retarget after M1 merges).
+- Alembic already has `0001_baseline` (empty). The schema migration is **`0002_initial_schema.py`**, `down_revision="0001"`, and must reproduce `docs/architecture/schema.sql`.
+- Tests: `tests/conftest.py` points `DATABASE_URL` at `TEST_DATABASE_URL` (compose Postgres on **port 5433**, DB `intake_test` from `docker/initdb/01-test-db.sql`). Add a migrated-schema fixture and per-test transaction rollback.
+- `app/config.py` exists (pydantic-settings, driver normalization, `cors_origins`). Add `jwt_secret`, `jwt_ttl_min=60`, `seed_users`, `env`.
+- `railway.json` pre-deploy becomes `["sh","-c","alembic upgrade head && python -m app.seed"]`.
+- `Makefile`: replace the `seed` placeholder, and add `schema-diff`.
+- **Don't touch** `app/extraction/**`, `evals/**` (lane B) or `apps/web/**` (lane C).
 
 ## 3. Design & architecture
 ### Contract
