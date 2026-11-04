@@ -2,7 +2,7 @@
 issue: M1
 title: Scaffold monorepo, health check and deploy skeleton
 branch: feat/dme-order-intake-p1-scaffold
-status: approved
+status: shipped
 approved_by: Ernesto
 approved_at: 2026-11-04
 autonomy: pr
@@ -150,5 +150,27 @@ Assumed without asking: a 2 s DB-check timeout, and the deploy order below.
 | status.md | Deploy | Live: web <vercel url>, API <railway url> |
 
 ## 5. Evidence
+- QA at `eaedff5` (`DB_PORT=5441`, this machine's port override): verify pass · app pass · api pass · browser pass (5/5) · ac **tool error** · diffcov not measured (no lcov configured)
+- `ac-coverage.mjs` crashes in `hooks/lib.mjs` `issueNumber()` on milestone ids (`m1-scaffold.md`, `AC-M1.x`). Coverage checked by hand instead (grep of the tags):
+
+| AC | Proof | Result |
+| --- | --- | --- |
+| AC-M1.0 | Bootstrap leak check before the `main` push and the feature-branch push; staged-content key scan | pass |
+| AC-M1.1 | `test_health.py::test_health_ok_with_db_up`, `.claude/qa/api-smoke.json` local | pass |
+| AC-M1.2 | `make verify` exit 0 (ruff, format, 6 pytest, tsc, eslint) | pass |
+| AC-M1.3 | `e2e/smoke.spec.ts`, 5 tests headless, local | pass |
+| AC-M1.4 | curl Railway `/health` 200 `db: ok`; smoke ok test against https://genhealth-dme-intake.vercel.app; CORS allow-origin matches the Vercel origin | pass |
+| AC-M1.5 | `test_health.py`: dependency raises → 503; real `statement_timeout` vs `pg_sleep` → 503 | pass |
+| AC-M1.6 | `smoke.spec.ts`: loading, ok, 503 → degraded, abort → unreachable, 390 px no overflow | pass |
+
+- Live: web https://genhealth-dme-intake.vercel.app · API https://api-production-b3c6.up.railway.app
+- Lines: 1,010 added across 44 files (size/XL), excluding lockfiles; ~400 hand-written, the rest scaffold (create-next-app, alembic init)
+- Cost: not measured. `budget.mjs` recorded 0 tokens, because the build ran in a subagent of the planning session
+- UI audit `/`: 0 serious, 0 minor (run by hand; qa's screens step is skipped when ac crashes)
+
 ## 6. Retro
+- The plan named `feat/order-intake`, which breaks the 3–5 word branch rule. The planner should run the conventions check on branch names before approval.
+- The milestone layout (`.claude/plans/mvp-<slug>/mN-*.md`, `AC-M1.x`) is not supported by `prepare.mjs`, `ac-coverage.mjs` or `hooks/lib.mjs issueNumber()`. Proposed fix: teach `issueNumber()` milestone ids, or have mvp write flat `M1-*.md` plans. Not applied: it's a process change.
+- Ports 5433 and 3000 were already taken by other local projects. Plans should not hard-code local ports; `project.local.json` overrides were the fix.
+
 ## 7. Hand-off
