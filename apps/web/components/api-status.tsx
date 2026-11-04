@@ -24,17 +24,18 @@ export function ApiStatus() {
   const [state, setState] = useState<State>("loading");
 
   useEffect(() => {
+    let active = true;
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 5000);
     fetch(`${API_URL}/health`, { signal: controller.signal })
-      .then((res) =>
-        setState(res.status === 200 ? "ok" : res.status === 503 ? "degraded" : "unreachable"),
-      )
-      .catch(() => setState("unreachable"))
+      .then((res) => {
+        if (active) setState(res.status === 200 ? "ok" : res.status === 503 ? "degraded" : "unreachable");
+      })
+      .catch(() => active && setState("unreachable"))
       .finally(() => clearTimeout(timer));
     return () => {
+      active = false;
       clearTimeout(timer);
-      controller.abort();
     };
   }, []);
 
