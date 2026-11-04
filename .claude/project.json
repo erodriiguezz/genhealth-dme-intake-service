@@ -1,7 +1,7 @@
 {
-  "integrationBranch": "feat/dme-order-intake",
+  "integrationBranch": "main",
   "productionBranch": "main",
-  "ticketSystem": "github",
+  "ticketSystem": "none",
   "install": "cd services/api && uv sync && cd ../../apps/web && pnpm install && cd ../../e2e && pnpm install",
   "verify": "make verify",
   "app": {
