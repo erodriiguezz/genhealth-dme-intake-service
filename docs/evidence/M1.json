@@ -1,0 +1,43 @@
+{
+  "issue": "M1",
+  "title": "Scaffold monorepo, health check and deploy skeleton",
+  "branch": "feat/dme-order-intake-p1-scaffold",
+  "commit": "0189312f1c3f4c657694db959b96c5e90a429433",
+  "plan": ".claude/plans/mvp-order-intake/m1-scaffold.md",
+  "size": "M",
+  "touchesApi": true,
+  "autonomy": "pr",
+  "approval": {
+    "by": "Ernesto",
+    "at": "2026-11-04"
+  },
+  "tests": {
+    "commit": "0189312f1c3f4c657694db959b96c5e90a429433",
+    "at": "2026-11-04T18:47:23.856Z",
+    "passed": false,
+    "steps": {
+      "verify": "pass",
+      "app": "pass",
+      "api": "pass",
+      "browser": "pass",
+      "ac": "fail",
+      "diffcov": "warn"
+    },
+    "acceptanceCriteria": null,
+    "criteria": [],
+    "diffCoverage": "not-measured",
+    "api": "pass",
+    "browser": "pass",
+    "target": "local"
+  },
+  "review": {
+    "local": "Approve — 0 blockers, 0 warnings, 1 consider (F1 deferred to M2)"
+  },
+  "cost": {
+    "estTokens": 330000,
+    "actualTokens": 0,
+    "toolCalls": 0,
+    "handoff": false
+  },
+  "writtenAt": "2026-11-04T18:50:02.348Z"
+}

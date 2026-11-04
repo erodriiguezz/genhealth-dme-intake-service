@@ -1,10 +1,10 @@
 ---
 issue: M6
 title: End-to-end proof on the deployed app, README and review guide
-branch: feat/order-intake-p6-e2e-docs
-status: draft
-approved_by:
-approved_at:
+branch: feat/dme-order-intake-p6-e2e-docs
+status: approved
+approved_by: Ernesto
+approved_at: 2026-11-04
 autonomy: pr
 source: mvp
 mvp: mvp-order-intake
@@ -12,8 +12,8 @@ size: M
 est_tokens: 250000
 est_lines: 200
 shape: single
-feature_branch: feat/order-intake
-base: feat/order-intake
+feature_branch: feat/dme-order-intake
+base: feat/dme-order-intake
 touches_api: false
 tier: high
 queue: false
@@ -58,6 +58,11 @@ queue: false
 **Out of scope:** CI, custom domain
 
 **Context:** `status.md`, "Code", "Deploy" and "Plan" rows: final state
+
+### Builds on M1 (actual state), lane A, wave 3 (~14:45)
+- Production URLs are known: web https://genhealth-dme-intake.vercel.app, API https://api-production-b3c6.up.railway.app.
+- Branch from `feat/dme-order-intake` after M3b and M4 merge. Redeploy both from that head first.
+- At the **14:55 freeze**, ship the README even if a journey is red. Record the red journey in the How to review and the release PR.
 
 ## 4. Plan
 ### Tasks (one commit each, in order)

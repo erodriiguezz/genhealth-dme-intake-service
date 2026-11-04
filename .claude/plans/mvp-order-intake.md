@@ -1,11 +1,11 @@
 ---
 mvp: mvp-order-intake
 title: GenHealth DME order-intake service
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Ernesto
+approved_at: 2026-11-04
 autonomy: pr
-feature_branch: feat/order-intake
+feature_branch: feat/dme-order-intake
 base: main
 repo: existing remote, erodriiguezz/genhealth-dme-intake-service (public, empty); local folder not yet a git repo
 est_tokens: 2400000
@@ -20,7 +20,7 @@ milestones: 6
 **MVP outcome:** A user signs up, uploads a faxed order PDF, and gets back a saved order with patient first/last name, DOB, and ordering provider name and NPI extracted. Each value carries its evidence quote. Nothing is guessed: missing or invalid fields are flagged and the order stays `needs_review` until the user fixes them in a review screen with the PDF alongside. Full CRUD over the API and UI, owner-scoped. Live at a public URL.
 
 **Architecture:**
-- Web: Next.js 15 (TS, App Router, Tailwind + shadcn/ui) on Vercel, calling the API directly with a bearer JWT
+- Web: Next.js 16 (TS, App Router, Tailwind + shadcn/ui) on Vercel, calling the API directly with a bearer JWT
 - API: FastAPI (Python 3.12, uv), SQLAlchemy 2 + Alembic, Docker on Railway
 - Data: Railway Postgres 16, tables `users`, `orders`, `documents` (PDF as bytea)
 - Extraction: Claude `claude-opus-5-5` reads the PDF natively, returns JSON-schema output with value + evidence + page per field, then deterministic validators (grounding, names, DOB, NPI Luhn). The provider is swappable for Bedrock
@@ -29,14 +29,14 @@ milestones: 6
 - Deep docs: `docs/architecture/{architecture,data-schema,api}.md`
 - History: one commit per completed task, milestone PRs merged without squash
 
-**Milestones** (each one PR into `feat/order-intake` with a commit per task, built, tested against the running app, merge-committed, then the next)
+**Milestones** (each one PR into `feat/dme-order-intake` with a commit per task, built, tested against the running app, merge-committed, then the next)
 | # | Issue | Milestone | Proves | Est. lines |
 | --- | --- | --- | --- | --- |
 | 1 | M1 | scaffold + deploy skeleton | Monorepo boots locally, `/health` green, `make verify` green, Playwright smoke, **API and web already live** on Railway/Vercel | ~450 |
 | 2 | M2 | data + auth + CRUD | Register/login, seeded reviewer accounts, Order CRUD persisted, user isolation (404), validators on create/patch | ~650 |
 | 3 | M3 | extraction | `POST /orders/extract` on the CPAP fax → saved order, NPI flagged `checksum_failed`, `needs_review`. Eval harness scores benchmark + synthetic set | ~650 |
 | 4 | M4 | web workflow UI | Sign up/in, orders list, upload → review/fix → ready, manual create/edit/delete, all states | ~800 |
-| 5 | M5 | PDF preview (cut line 14:30) | Review screen renders the stored PDF, and "p.N" evidence chips jump to that page | ~250 |
+| 5 | M5 | PDF preview: **cut at re-plan (13:50), backlog B9** | Review screen renders the stored PDF, and "p.N" evidence chips jump to that page | ~250 |
 | 6 | M6 | end-to-end proof + docs | 3 journeys proven headless against the **deployed** app. README, curl walkthrough, How to review | ~200 |
 
 **End-to-end acceptance** (owned by M6, proven in the headless browser against the deployed URL)
@@ -71,7 +71,7 @@ Full log with every option offered: `docs/process/grill-log.md`. Decisions: `doc
 | 1.3 | Auth | How do users authenticate? | API-owned JWT |
 | 1.4 | Hosting | Where? | Vercel + Railway (overrode Render + Neon) |
 | 2.1 | Timebox | Has it started? | Yes, at 12:13. Hard stop 15:13 |
-| 2.2 | Repo | Visibility and branches? | Public, milestone PRs → `feat/order-intake` → release PR into `main` |
+| 2.2 | Repo | Visibility and branches? | Public, milestone PRs → `feat/dme-order-intake` → release PR into `main` |
 | 2.3 | Frontend | How much? | Review UI + PDF preview |
 | 2.4/2.5 | PDF storage | Keep the PDF? | Yes, for the preview (overrode discard) |
 | 2.6 | Scope cut | Preview scheduling? | Last feature milestone, cut line 14:30 |
@@ -117,7 +117,7 @@ flowchart LR
 | DB | Postgres 16 | JSONB for issues and extraction, bytea for PDFs, Railway-native | SQLite (not shared across deploys) |
 | Extraction | Claude Opus 5.5, native PDF | Best on scans and distractors. See the ADR | OCR + LLM, OCR + regex |
 | Auth | argon2id + JWT | Curl-testable, no vendor | Clerk, Supabase Auth |
-| Web | Next.js 15 + Tailwind + shadcn/ui, pnpm | The human's choice, fast to a finished-looking UI | — |
+| Web | Next.js 16 + Tailwind + shadcn/ui, pnpm | The human's choice, fast to a finished-looking UI | — |
 | API types in web | `openapi-typescript` from `/openapi.json` | No duplicated types | Hand-written types |
 | E2E | Playwright | Headless proof against local and deployed | Cypress |
 | Hosting | Vercel + Railway | The human's choice, no body limit on the API | Vercel for the API (4.5 MB), Render + Neon |
@@ -140,8 +140,8 @@ flowchart LR
   - stop: `docker compose down`
 - Verify: `make verify` = ruff check + ruff format --check + pytest (API) + tsc + eslint (web).
 - Tests: API unit/integration in `services/api/tests` (pytest against compose Postgres, Claude mocked via a fake `Extractor`). E2E in `e2e/` (Playwright). Extraction evals in `evals/`, which call live Claude and are run on demand, not in verify.
-- Commits: one conventional commit per completed task (each milestone plan lists its tasks), so `git log` shows the work step by step. Milestone PRs merge into `feat/order-intake` with **merge commits, not squash**, so the task history reaches `main`.
-- Deep docs: `docs/architecture/architecture.md`, `data-schema.md`, `api.md`. UI design source: the prototype artifact + `docs/context/designs/`.
+- Commits: one conventional commit per completed task (each milestone plan lists its tasks), so `git log` shows the work step by step. Milestone PRs merge into `feat/dme-order-intake` with **merge commits, not squash**, so the task history reaches `main`.
+- Deep docs: `docs/architecture/architecture.md`, `schema.md`, `api.md`. UI design source: the prototype artifact + `docs/context/designs/`.
 - Secrets: `.env` files gitignored, `.env.example` committed. Logs never contain field values.
 
 ### ADRs
@@ -165,3 +165,78 @@ Design: `docs/context/designs/ui.md`. Backlog: `docs/backlog.md`.
 - `.claude/plans/mvp-order-intake/m4-web-ui.md`
 - `.claude/plans/mvp-order-intake/m5-pdf-preview.md`
 - `.claude/plans/mvp-order-intake/m6-e2e-docs.md`
+
+## 6. Stacking plan (re-planned 13:50, with M1 in PR #1)
+
+M1 delivered `feat/dme-order-intake-p1-scaffold` @ `0189312`. Live: web https://genhealth-dme-intake.vercel.app, API https://api-production-b3c6.up.railway.app. 1h23 remained against the 15:13 hard stop and a 14:55 submission freeze, which is less than the ~2h of sequential work left. So the remaining milestones run in **parallel lanes on disjoint files**, each branched from M1's head. Each PR is retargeted to `feat/dme-order-intake` once M1 merges.
+
+| Wave | Start | Lane | Milestone | Base | Owns (disjoint) | Est. |
+|---|---|---|---|---|---|---|
+| 1 | now | A | **M2** data + auth + CRUD | M1 head | `app/{models,schemas,security,ratelimit,seed}.py`, `app/routers/{auth,orders}.py`, `app/services/orders.py`, `app/validation/`, `alembic/versions/0002_*`, `tests/test_{auth,orders,validation,seed}.py` | 30m |
+| 1 | now | B | **M3a** extraction core (M3 tasks 1, 3, 4, 8, 9) | M1 head | `app/extraction/**` (incl. its own `settings.py`), `evals/**`, `tests/test_{grounding,extractor}.py`. **No DB, no routers** | 30m |
+| 1 | now | C | **M4** web UI | M1 head | `apps/web/**`, `e2e/{auth,orders,upload}.spec.ts`. Codes against `docs/architecture/api.md` | 40m |
+| 2 | ~14:25 | A | **M3b** wire-up (M3 tasks 2, 5, 6, 7, 10) | `feat/dme-order-intake` after M2 + M3a merge | `app/services/documents.py`, `app/routers/extract.py`, `GET /orders/{id}/document`, deploy + benchmark smoke | 20m |
+| 2 | ~14:25 | C | M4 e2e against the merged API | rebased on the feature branch | runs Playwright with `EXTRACTION_PROVIDER=fake` | (in M4) |
+| 3 | ~14:45 | A | **M6** deployed journeys + README | feature branch | `e2e/journeys.spec.ts`, `README.md`, `docs/reviews/` | 10m |
+| — | — | — | **M5 PDF preview: CUT** | — | The 14:30 cut line falls inside wave 2. Moved to backlog B9. The review screen ships without the PDF pane (the prototype's form column) | — |
+
+**Merge order:** M1 → M2 → M3a → M3b → M4 → M6. Merge commits, no squash.
+
+**Shared-file rules** (the only places lanes touch the same files):
+- `services/api/pyproject.toml` + `uv.lock`: lane A adds `argon2-cffi`, `pyjwt`, `python-multipart`; lane B adds `anthropic`, `pypdf`, `reportlab`, `pillow`. On merge, take both dependency lists and re-run `uv lock`. Never hand-merge the lockfile.
+- `Makefile`: lane A replaces the `seed` placeholder and adds `schema-diff`. Lane B replaces the `eval` placeholder. These are different lines.
+- `app/config.py`: lane A only (`jwt_secret`, `seed_users`, `env`). Lane B keeps its settings in `app/extraction/settings.py` (`EXTRACTION_PROVIDER`, `EXTRACTION_MODEL`, `ANTHROPIC_API_KEY`, `EXTRACTION_TIMEOUT_S`).
+- `app/main.py`: lane A registers the auth and orders routers. M3b registers extract.
+- `services/api/railway.json`: lane A only (pre-deploy adds `python -m app.seed`).
+
+**Freeze rule:** at 14:55, whatever is merged and deployed is the submission. Then the feature-release PR opens, and the README is written even if M6's journeys aren't all green.
+
+## 7. Hand-off (14:16, stop-hook loop breaker: 5 red verify runs)
+
+**What's red:** the stop hook's plain `make verify` in the main checkout (`feat/dme-order-intake` @ 90cda1e). The failures change from run to run, with green runs in between (14:15: 101 passed):
+```
+E  sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedTable) relation "users" does not exist
+FAILED tests/test_seed.py::test_rerun_changes_nothing_even_with_new_password - assert (2, 0) == (0, 2)
+FAILED tests/test_orders.py::test_crud_round_trip - assert 401 == 201
+FAILED tests/test_isolation.py::test_each_user_lists_only_their_own - KeyError: 'total'
+ERROR tests/test_orders.py::test_server_owned_keys_rejected[id] - sqlalchemy.exc.IntegrityError: (psycopg.errors.UniqueViolation)
+16 failed, 83 passed, 3 errors in 9.19s
+```
+
+**Diagnosis (high confidence, not proven):** test interference, not a code defect. Every lane, the reviewer agents and the stop hook share one local test DB, `intake_test` on `localhost:55433`, whenever they run pytest without an explicit `TEST_DATABASE_URL`, because the conftest default points there. The schema fixtures drop and recreate tables while another run is mid-test. That explains missing tables, users vanishing (401s), seed counts doubling and unique violations. The same suite is green whenever it runs alone (14:13 and 14:15: 101 passed).
+
+**Tried:**
+1. Separate ports per lane (5451–5454): fixed bind clashes.
+2. Moved the default port off 5433 to 55433: fixed the stop hook's bind clash.
+3. Re-ran in isolation: green.
+
+Agents that run `uv run pytest` directly still land on the shared default DB.
+
+**Suggested next step (small, in scope for M3b or a chore):** make the test DB unique per run. In `services/api/tests/conftest.py`, create `intake_test_<pid>_<random>` at session start from the admin connection and drop it at session end, so no two pytest processes share tables. Then clear the lock with `node ~/.claude/skills/plan/scripts/budget.mjs reset`.
+
+**State of delivery at hand-off:**
+- **Merged:** M1 (#1), M2 (#3), M3a (#2).
+- **In flight:**
+  - M3b (extraction API + deploy): builder running.
+  - M4 (#4): in review.
+- **Live eval:** 100% field accuracy, 0 no-guess violations.
+- **Human:** set `ANTHROPIC_API_KEY` and `SEED_USERS` on Railway.
+
+**Update ~14:20, M3b reported:**
+- Branch `feat/dme-order-intake-p3-extraction-api` is pushed (5f188e3, 49bed7d, ccab0e8, 5ab4703). `make verify` is green on its isolated DB with 120 tests, and schema-diff is clean. **No PR yet.**
+- Deployed to Railway: `/health` is 200, and `/openapi.json` lists the extract and document endpoints.
+- **Production blocker:** register and login return 500. The Railway logs show `relation "users" does not exist`, so migrations never ran against the app's database. Either the pre-deploy hook didn't run, or the api service's `DATABASE_URL` doesn't reference the Railway Postgres service. Locally, the same migration creates all the tables.
+- The builder tried `railway ssh` to run the migration and auto mode denied it as a production action. The lead didn't retry it. **Needs the human.**
+
+**Next steps for the human:**
+1. In Railway, check whether the api deploy's pre-deploy step ran, and that api's `DATABASE_URL` references the Postgres service.
+2. Either approve the lead running the migration and seed on prod, or fix the config and redeploy.
+3. Set `ANTHROPIC_API_KEY` and `SEED_USERS`.
+4. Clear the lock (`budget.mjs reset`) and say "continue". The lead then opens the M3b PR, fixes test-DB isolation, runs M4 against the real API, and runs M6.
+
+**Update, PR #4 (M4) review: request changes** (comment 6639765293):
+- **Blocker F1:** the e2e stub flags NPI 9182734556 with only `npi.checksum_failed`. The real API also adds `npi.prefix`, so "1 error must be fixed" fails under `E2E_REAL_API=1`. Fix the stub and make the assertion count-agnostic.
+- **F2:** the review screen hides the provider-candidates list exactly when `provider.multiple_candidates` fires, and the real warning text doesn't name the other provider. Always show the candidates.
+- **F3:** M4 removed M1's API-health widget and smoke spec (AC-M1.3/M1.6) because `/` now redirects. **The human decides.** The lead recommends retiring those criteria and keeping the API `/health` smoke.
+- **F4:** raw hex colors in order-form instead of tokens.
+- Considers F5–F7 (CSP `unsafe-inline`, zod limits vs. schemas.py, the 401 redirect losing the page): the lead decides once unlocked.

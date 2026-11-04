@@ -1,0 +1,49 @@
+{
+  "checks": [
+    {
+      "name": "GET /health is ok with the DB up",
+      "method": "GET",
+      "url": "/health",
+      "expectStatus": 200,
+      "expectBodyIncludes": "\"db\":\"ok\"",
+      "ac": "AC-M1.1"
+    },
+    {
+      "name": "register accepts a new user (or 409 on re-run)",
+      "method": "POST",
+      "url": "/auth/register",
+      "body": {
+        "email": "smoke@example.com",
+        "password": "correct-horse-9"
+      },
+      "expectStatus": [
+        201,
+        409
+      ],
+      "ac": "AC-M2.1"
+    },
+    {
+      "name": "login with a wrong password is 401",
+      "method": "POST",
+      "url": "/auth/login",
+      "expectStatus": [
+        401,
+        422,
+        429
+      ],
+      "ac": "AC-M2.1"
+    },
+    {
+      "name": "orders without a token is 401",
+      "url": "/orders",
+      "expectStatus": 401,
+      "ac": "AC-M2.3"
+    },
+    {
+      "name": "order of an unknown id without a token is 401",
+      "url": "/orders/00000000-0000-0000-0000-000000000000",
+      "expectStatus": 401,
+      "ac": "AC-M2.3"
+    }
+  ]
+}

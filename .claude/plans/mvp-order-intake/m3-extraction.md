@@ -1,10 +1,10 @@
 ---
 issue: M3
 title: PDF upload and Claude extraction with grounding, validation and eval harness
-branch: feat/order-intake-p3-extraction
-status: draft
-approved_by:
-approved_at:
+branch: feat/dme-order-intake-p3-extraction
+status: approved
+approved_by: Ernesto
+approved_at: 2026-11-04
 autonomy: pr
 source: mvp
 mvp: mvp-order-intake
@@ -12,8 +12,8 @@ size: L
 est_tokens: 500000
 est_lines: 650
 shape: single
-feature_branch: feat/order-intake
-base: feat/order-intake
+feature_branch: feat/dme-order-intake
+base: feat/dme-order-intake
 touches_api: true
 tier: high
 queue: false
@@ -85,6 +85,12 @@ The builder **must read the `claude-api` skill's Python docs before writing the 
 ---
 ## 2. Grill
 See `docs/process/grill-log.md` (rounds 1–3, benchmark findings).
+
+### Builds on M1 + split into two lanes (re-plan 13:50)
+- **M3a, lane B, wave 1, in parallel with M2:** tasks 1, 3, 4, 8, 9 (extractor protocol + fake, grounding, Anthropic extractor, eval cases, eval runner). Branch `feat/dme-order-intake-p3a-extraction-core` from M1 head (0189312). **No DB and no routers.** Settings go in `app/extraction/settings.py`, not `app/config.py`. Only the `eval` target changes in the `Makefile`. Read the `claude-api` skill's Python docs before writing `anthropic_extractor.py`.
+- **M3b, lane A, wave 2, after M2 + M3a merge:** tasks 2, 5, 6, 7, 10 (document service, `/orders/extract`, `/orders/{id}/document`, guard tests, deploy + benchmark smoke). Branch `feat/dme-order-intake-p3b-extraction-api` from `feat/dme-order-intake`. Uses M2's models, validators and status, and M3a's `Extractor`.
+- AC split: M3a proves AC-M3.2 (grounding half) and AC-M3.6 (eval). M3b proves AC-M3.1, M3.2 (endpoint half), M3.3, M3.4, M3.5 and M3.7.
+- Live eval: `ANTHROPIC_API_KEY` is in the API's local env file (pre-flight done). Run at most twice.
 
 ## 3. Design & architecture
 ### Extraction schema (per field)

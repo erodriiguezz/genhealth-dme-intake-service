@@ -114,7 +114,7 @@ curl -sS -X POST "$API/orders/extract" \
     { "field": "patient_dob", "code": "dob.age_over_120", "severity": "warning", "message": "Patient would be 124 years old. Check the date.", "source": "validation" },
     { "field": "provider_name", "code": "provider.multiple_candidates", "severity": "warning", "message": "Also on the document: Gregory House MD (referring physician, p.2).", "source": "extraction" }
   ],
-  "extraction": { "model": "claude-opus-5-5", "latency_ms": 18432, "fields": { "…": "see data-schema.md" }, "provider_candidates": [] },
+  "extraction": { "model": "claude-opus-5-5", "latency_ms": 18432, "fields": { "…": "see schema.md" }, "provider_candidates": [] },
   "document": { "id": "a0b2…", "filename": "DME Patient Demo Document CPAP.fax.pdf", "page_count": 4, "size_bytes": 1992294 },
   "created_at": "2026-11-04T18:02:11Z",
   "updated_at": "2026-11-04T18:02:11Z"

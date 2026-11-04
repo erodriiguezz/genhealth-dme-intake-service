@@ -52,7 +52,7 @@ erDiagram
 | `password_hash` | `text` | no | — | argon2id (`argon2-cffi` defaults: t=3, m=64 MiB, p=4). Never returned and never logged |
 | `created_at` | `timestamptz` | no | `now()` | |
 
-Needs the `citext` extension, created in migration 0001 (`CREATE EXTENSION IF NOT EXISTS citext`).
+Needs the `citext` extension, created in migration 0002 (`CREATE EXTENSION IF NOT EXISTS citext`).
 
 ### `documents`
 | Column | Type | Null | Default | Notes |
