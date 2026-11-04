@@ -6,6 +6,7 @@
   },
   "deploy": {
     "healthcheckPath": "/health",
-    "healthcheckTimeout": 60
+    "healthcheckTimeout": 60,
+    "numReplicas": 1
   }
 }

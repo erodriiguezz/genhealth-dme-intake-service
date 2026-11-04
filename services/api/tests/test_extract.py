@@ -79,7 +79,8 @@ def test_ac_m3_2_ungrounded_value_is_dropped(client, make_user, monkeypatch):
     use(monkeypatch, Stub(patient_first_name=bad))
     b = upload(client, h).json()
     assert b["patient_first_name"] is None
-    assert {"patient_first_name.ungrounded", "patient_first_name.not_found"} <= codes(b)
+    assert "patient_first_name.ungrounded" in codes(b)
+    assert "patient_first_name.not_found" not in codes(b)
     f = b["extraction"]["fields"]["patient_first_name"]
     assert f["raw"] == "Pierre" and f["grounded"] is False
     assert b["status"] == "needs_review"
@@ -100,6 +101,8 @@ def test_ac_m3_2_unparseable_dob_keeps_raw(client, make_user, monkeypatch):
     b = upload(client, h).json()
     assert b["patient_dob"] is None
     assert "dob.unparseable" in codes(b)
+    assert "patient_dob.not_found" not in codes(b)
+    assert next(i for i in b["issues"] if i["code"] == "dob.unparseable")["source"] == "validation"
     assert b["extraction"]["fields"]["patient_dob"]["raw"] == "13/45/1980"
 
 
@@ -262,3 +265,34 @@ def test_ac_m3_5_no_phi_in_logs_on_success(client, make_user, fake, caplog):
         assert upload(client, h, name="Marie-Curie.pdf").status_code == 201
     for phi in ("Marie", "Curie", "9182734556", "Arjun"):
         assert phi not in caplog.text
+
+
+def test_ac_m3_3_oversized_content_length_rejected_before_parsing(client, make_user):
+    _, h = make_user()
+    r = client.post(
+        "/orders/extract",
+        headers={**h, "Content-Length": str(documents.MAX_BYTES + 2 * 1024 * 1024)},
+        content=b"x",
+    )
+    assert r.status_code == 413
+    assert r.json()["error"]["code"] == "file_too_large"
+
+
+def test_ac_m3_3_chunked_body_over_cap_rejected(client, make_user, monkeypatch):
+    from app import upload_limit
+
+    monkeypatch.setattr(upload_limit, "MAX_BYTES", 1000)
+    monkeypatch.setattr(upload_limit, "SLACK", 100)
+    _, h = make_user()
+
+    def chunks():
+        for _ in range(5):
+            yield b"x" * 500
+
+    r = client.post(
+        "/orders/extract",
+        headers={**h, "Content-Type": "multipart/form-data; boundary=b"},
+        content=chunks(),
+    )
+    assert r.status_code == 413
+    assert r.json()["error"]["code"] == "file_too_large"

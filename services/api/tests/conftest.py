@@ -1,3 +1,4 @@
+import atexit
 import os
 import secrets
 
@@ -20,6 +21,16 @@ def _admin():
 
 with _admin() as _conn:
     _conn.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(TEST_DB_NAME)))
+
+
+def _drop_test_db():
+    with _admin() as conn:
+        conn.execute(
+            sql.SQL("DROP DATABASE IF EXISTS {} WITH (FORCE)").format(sql.Identifier(TEST_DB_NAME))
+        )
+
+
+atexit.register(_drop_test_db)  # also covers a failed setup or Ctrl-C
 
 os.environ["DATABASE_URL"] = _server.set(database=TEST_DB_NAME).render_as_string(
     hide_password=False
@@ -49,11 +60,6 @@ def migrated_db():
     command.downgrade(cfg, "base")
     command.upgrade(cfg, "head")
     yield
-    get_engine().dispose()
-    with _admin() as conn:
-        conn.execute(
-            sql.SQL("DROP DATABASE IF EXISTS {} WITH (FORCE)").format(sql.Identifier(TEST_DB_NAME))
-        )
 
 
 @pytest.fixture(autouse=True)

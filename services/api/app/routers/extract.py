@@ -60,14 +60,10 @@ def _extraction_json(result: Any, grounded: dict[str, bool]) -> dict[str, Any]:
 
 @router.post("/extract", status_code=201, response_model=OrderOut)
 def extract_order(
-    request: Request,
     file: UploadFile = File(...),
     user: User = Depends(_rate_limit),
     db: Session = Depends(get_db),
 ) -> Order:
-    length = request.headers.get("content-length")
-    if length and length.isdigit() and int(length) > documents.MAX_BYTES + 1024 * 1024:
-        raise ApiError(413, "file_too_large", "The PDF is larger than 20 MB.")
     upload = documents.load_upload(file.file, file.filename)
 
     try:
@@ -98,7 +94,7 @@ def extract_order(
                 "dob.unparseable",
                 "error",
                 "The date of birth could not be read as a date. Enter it manually.",
-                "extraction",
+                "validation",
             ).to_json()
         )
 
@@ -109,7 +105,17 @@ def extract_order(
         "provider_name": fields["provider_name"].value,
         "provider_npi": normalize_npi(fields["provider_npi"].value),
     }
-    validation = validate_order(values)
+    # One error per cause: a field already flagged at extraction doesn't also get not_found.
+    flagged = {
+        i["field"]
+        for i in extraction_issues
+        if i["code"].endswith(".ungrounded") or i["code"] == "dob.unparseable"
+    }
+    validation = [
+        i
+        for i in validate_order(values)
+        if not (i.field in flagged and i.code.endswith(".not_found"))
+    ]
     seen = {(i.field, i.code) for i in validation}
     extra = [i for i in extraction_issues if (i["field"], i["code"]) not in seen]
     issues = [*(i.to_json() for i in validation), *extra]
