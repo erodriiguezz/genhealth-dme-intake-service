@@ -12,7 +12,7 @@ TEST_DATABASE_URL ?= postgresql://intake:intake@localhost:$(DB_PORT)/intake_test
 verify:
 	docker compose up -d --wait db
 	cd $(API) && uv run ruff check . && uv run ruff format --check . && TEST_DATABASE_URL=$(TEST_DATABASE_URL) uv run pytest -q
-	cd $(WEB) && pnpm exec tsc --noEmit && pnpm exec eslint .
+	cd $(WEB) && pnpm exec next typegen && pnpm exec tsc --noEmit && pnpm exec eslint .
 
 dev:
 	@trap 'kill 0' INT TERM EXIT; \
