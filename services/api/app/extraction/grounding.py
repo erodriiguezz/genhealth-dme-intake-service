@@ -1,0 +1,98 @@
+"""Pure grounding checks over extraction output. No I/O."""
+
+import re
+from datetime import date, datetime
+
+from .base import ExtractionResult, FieldResult
+
+_SEPARATORS = re.compile(r"[\s\-./]+")
+_WS = re.compile(r"\s+")
+_SEPARATOR_FIELDS = {"patient_dob", "provider_npi"}
+
+
+def _norm(text: str, strip_separators: bool) -> str:
+    text = text.casefold()
+    return _SEPARATORS.sub("", text) if strip_separators else _WS.sub(" ", text).strip()
+
+
+def is_grounded(field: str, value: str | None, evidence: str | None) -> bool:
+    if not value or not evidence:
+        return False
+    strip = field in _SEPARATOR_FIELDS
+    needle = _norm(value, strip)
+    return bool(needle) and needle in _norm(evidence, strip)
+
+
+def _issue(field: str, code: str, severity: str, message: str) -> dict:
+    return {
+        "field": field,
+        "code": code,
+        "severity": severity,
+        "message": message,
+        "source": "extraction",
+    }
+
+
+def apply_grounding(result: ExtractionResult) -> tuple[dict[str, FieldResult], list[dict]]:
+    """Return (fields with ungrounded values dropped, issues). The input is not mutated."""
+    fields: dict[str, FieldResult] = {}
+    issues: list[dict] = []
+    for name, f in result.fields.items():
+        if f.value is None or f.value == "":
+            fields[name] = FieldResult()
+            continue
+        if is_grounded(name, f.value, f.evidence):
+            fields[name] = f
+        else:
+            fields[name] = FieldResult(evidence=f.evidence, page=f.page)
+            issues.append(
+                _issue(
+                    name,
+                    f"{name}.ungrounded",
+                    "error",
+                    "Extracted value was not found in its evidence quote and was dropped.",
+                )
+            )
+    names = {_WS.sub(" ", c.name).strip().casefold() for c in result.provider_candidates}
+    if len(names) > 1:
+        issues.append(
+            _issue(
+                "provider_name",
+                "provider.multiple_candidates",
+                "warning",
+                "The document names more than one provider; confirm the ordering provider.",
+            )
+        )
+    return fields, issues
+
+
+_MONTHS = "%B %d, %Y"
+
+
+def parse_dob(raw: str | None) -> date | None:
+    """US MM/DD/YYYY first, then ISO, then 'Month D, YYYY'. Unparseable -> None."""
+    if not raw:
+        return None
+    s = _WS.sub(" ", raw).strip()
+    if m := re.fullmatch(r"(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})", s):
+        try:
+            return date(int(m[3]), int(m[1]), int(m[2]))
+        except ValueError:
+            return None
+    if m := re.fullmatch(r"(\d{4})-(\d{1,2})-(\d{1,2})", s):
+        try:
+            return date(int(m[1]), int(m[2]), int(m[3]))
+        except ValueError:
+            return None
+    for fmt in (_MONTHS, "%b %d, %Y", "%B %d %Y"):
+        try:
+            return datetime.strptime(s, fmt).date()
+        except ValueError:
+            continue
+    return None
+
+
+def normalize_npi(raw: str | None) -> str | None:
+    if raw is None:
+        return None
+    return re.sub(r"[\s\-.]", "", raw) or None
