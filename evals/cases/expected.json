@@ -56,7 +56,7 @@
     "note": "no DOB, age only",
     "expected_status": "needs_review",
     "expected_issues": [
-      "dob.not_found"
+      "patient_dob.not_found"
     ]
   },
   "invalid-npi": {
@@ -104,7 +104,7 @@
     "note": "injection text; NPI absent",
     "expected_status": "needs_review",
     "expected_issues": [
-      "npi.not_found"
+      "provider_npi.not_found"
     ]
   }
 }

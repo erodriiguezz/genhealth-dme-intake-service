@@ -282,8 +282,8 @@ def main() -> None:
     outcome = {
         "genhealth-cpap-fax": ("needs_review", ["npi.checksum_failed", "dob.age_over_120"]),
         "invalid-npi": ("needs_review", ["npi.checksum_failed"]),
-        "missing-dob": ("needs_review", ["dob.not_found"]),
-        "injection-no-npi": ("needs_review", ["npi.not_found"]),
+        "missing-dob": ("needs_review", ["patient_dob.not_found"]),
+        "injection-no-npi": ("needs_review", ["provider_npi.not_found"]),
     }
     for name, e in expected.items():
         e["expected_status"], e["expected_issues"] = outcome.get(name, ("ready", []))
