@@ -54,7 +54,6 @@ export function AuthForm({ mode }: { mode: Mode }) {
     <main className="flex flex-1 justify-center px-4 py-12 sm:py-24">
       <form
         onSubmit={onSubmit}
-        noValidate={false}
         className="flex h-fit w-full max-w-[380px] flex-col gap-5 rounded-xl border bg-card p-8"
       >
         <div className="flex flex-col gap-1">
