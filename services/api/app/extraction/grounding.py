@@ -5,22 +5,38 @@ from datetime import date, datetime
 
 from .base import ExtractionResult, FieldResult
 
-_SEPARATORS = re.compile(r"[\s\-./]+")
 _WS = re.compile(r"\s+")
-_SEPARATOR_FIELDS = {"patient_dob", "provider_npi"}
-
-
-def _norm(text: str, strip_separators: bool) -> str:
-    text = text.casefold()
-    return _SEPARATORS.sub("", text) if strip_separators else _WS.sub(" ", text).strip()
+_NPI_SEP = re.compile(r"[\s\-.]+")
+_DATE_SEP = re.compile(r"[\s\-./,]+")
 
 
 def is_grounded(field: str, value: str | None, evidence: str | None) -> bool:
+    """The value must appear in its evidence on digit (NPI, DOB) or word (names) boundaries."""
     if not value or not evidence:
         return False
-    strip = field in _SEPARATOR_FIELDS
-    needle = _norm(value, strip)
-    return bool(needle) and needle in _norm(evidence, strip)
+    v, e = value.casefold(), evidence.casefold()
+    if field == "provider_npi":
+        v, e = _NPI_SEP.sub("", v), _NPI_SEP.sub("", e)
+        return bool(v) and re.search(rf"(?<!\d){re.escape(v)}(?!\d)", e) is not None
+    if field == "patient_dob":
+        tokens = [t for t in _DATE_SEP.split(v) if t]
+        if not tokens:
+            return False
+        if len(tokens) == 1 and v.isdigit():
+            e = _DATE_SEP.sub("", e)
+            return re.search(rf"(?<!\d){re.escape(v)}(?!\d)", e) is not None
+        sep = r"[\s\-./,]+"
+        pattern = sep.join(re.escape(t) for t in tokens)
+        for m in re.finditer(rf"(?<!\w){pattern}(?!\w)", e):
+            # a bigger date (e.g. 12/05/1900 around 05/1900) is not the same date
+            if re.search(r"\d[\s\-./,]*$", e[: m.start()]) or re.match(
+                r"[\s\-./,]*\d", e[m.end() :]
+            ):
+                continue
+            return True
+        return False
+    v, e = _WS.sub(" ", v).strip(), _WS.sub(" ", e).strip()
+    return bool(v) and re.search(rf"(?<!\w){re.escape(v)}(?!\w)", e) is not None
 
 
 def _issue(field: str, code: str, severity: str, message: str) -> dict:
@@ -95,4 +111,4 @@ def parse_dob(raw: str | None) -> date | None:
 def normalize_npi(raw: str | None) -> str | None:
     if raw is None:
         return None
-    return re.sub(r"[\s\-.]", "", raw) or None
+    return _NPI_SEP.sub("", raw) or None
