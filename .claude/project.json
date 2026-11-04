@@ -29,7 +29,7 @@
         "env": "API_PORT"
       },
       "db": {
-        "port": 5433,
+        "port": 55433,
         "env": "DB_PORT"
       }
     }

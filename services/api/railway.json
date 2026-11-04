@@ -4,6 +4,6 @@
   "deploy": {
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60,
-    "preDeployCommand": ["alembic upgrade head"]
+    "preDeployCommand": ["sh", "-c", "alembic upgrade head && python -m app.seed"]
   }
 }

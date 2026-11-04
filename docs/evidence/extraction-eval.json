@@ -1,0 +1,323 @@
+{
+  "status": "run",
+  "provider": "anthropic",
+  "model": "claude-opus-5-5",
+  "prompt_version": "2026-11-04.2",
+  "run_at": "2026-11-04T19:12:58+00:00",
+  "cases": 9,
+  "fields_scored": 45,
+  "fields_correct": 45,
+  "field_accuracy": 1.0,
+  "no_guess_violations": 0,
+  "case_errors": 0,
+  "input_tokens": 40251,
+  "output_tokens": 3648,
+  "cost_usd_estimate": 0.234,
+  "targets": {
+    "field_accuracy": 0.95,
+    "no_guess_violations": 0
+  },
+  "results": {
+    "genhealth-cpap-fax": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Marie",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Curie",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "12/05/1900",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Arjun Raj D.P.M",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "9182734556",
+          "ok": true,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [
+        "provider.multiple_candidates"
+      ],
+      "latency_ms": 8034,
+      "input_tokens": 7959,
+      "output_tokens": 772
+    },
+    "clean-swo": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Jordan",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Alvarez",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "03/14/1962",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Dana Whitfield, MD",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "1245319599",
+          "ok": true,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [],
+      "latency_ms": 4250,
+      "input_tokens": 3475,
+      "output_tokens": 406
+    },
+    "scanned-fax-noisy": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Priya",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Natarajan",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "07/22/1978",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Owen Castellanos, MD",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "1003000126",
+          "ok": true,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [],
+      "latency_ms": 4677,
+      "input_tokens": 3300,
+      "output_tokens": 400
+    },
+    "fields-on-page-3": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Lena",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Okafor",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "11/02/1985",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Marcus Teller, DO",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "1427019991",
+          "ok": true,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [],
+      "latency_ms": 3751,
+      "input_tokens": 8226,
+      "output_tokens": 303
+    },
+    "missing-dob": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Samuel",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Brooks",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": null,
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Irene Voss, MD",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "1578451324",
+          "ok": true,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [],
+      "latency_ms": 4419,
+      "input_tokens": 3473,
+      "output_tokens": 299
+    },
+    "invalid-npi": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Hana",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Mori",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "09/30/1971",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Felix Baptiste, MD",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "1234567890",
+          "ok": true,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [],
+      "latency_ms": 4509,
+      "input_tokens": 3472,
+      "output_tokens": 371
+    },
+    "referring-distractor": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Tobias",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Lindqvist",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "05/09/1966",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Nadia Rahman, MD",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "1699780114",
+          "ok": true,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [
+        "provider.multiple_candidates"
+      ],
+      "latency_ms": 5024,
+      "input_tokens": 3525,
+      "output_tokens": 356
+    },
+    "handwritten-style": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Rosa",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Delgado",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "02/18/1954",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Kevin Abara, MD",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "1740298355",
+          "ok": true,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [],
+      "latency_ms": 5019,
+      "input_tokens": 3300,
+      "output_tokens": 418
+    },
+    "injection-no-npi": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Gwen",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Ashby",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "12/01/1949",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Paul Nguyen, MD",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": null,
+          "ok": true,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [],
+      "latency_ms": 4181,
+      "input_tokens": 3521,
+      "output_tokens": 323
+    }
+  }
+}

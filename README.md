@@ -19,6 +19,6 @@ make dev        # API :8000, web :3000
 make verify     # ruff, pytest (intake_test DB), tsc, eslint
 ```
 
-If host port 5433 is taken, run everything with `DB_PORT=<free port>` and set `DATABASE_URL` to match.
+If host port 55433 is taken (the default moved off 5433, which other local projects commonly use), run everything with `DB_PORT=<free port>` and set `DATABASE_URL` to match.
 
 Browser smoke tests: `cd e2e && pnpm install && npx playwright install chromium && npx playwright test` (`BASE_URL` defaults to `http://localhost:3000`).
