@@ -47,7 +47,7 @@ queue: false
 - Left alone: web app
 - Rollback: `alembic downgrade base`
 
-**Concerns:** None
+**Concerns:** From M1 review (F1): `app/db.py` sets libpq `tcp_user_timeout` to the 2 s health budget on the shared engine, so from M2 on any real query whose sent data stays unacknowledged for 2 s drops its connection. M2 must give it its own setting (e.g. `DB_TCP_USER_TIMEOUT_MS`, default 10000) or use a separate engine for `/health`.
 
 **Security:**
 - Data in and out: credentials in, a JWT out. Order PHI fields in and out
