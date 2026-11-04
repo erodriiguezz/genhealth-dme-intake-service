@@ -190,3 +190,34 @@ M1 delivered `feat/dme-order-intake-p1-scaffold` @ `0189312`. Live: web https://
 - `services/api/railway.json`: lane A only (pre-deploy adds `python -m app.seed`).
 
 **Freeze rule:** at 14:55, whatever is merged and deployed is the submission. Then the feature-release PR opens, and the README is written even if M6's journeys aren't all green.
+
+## 7. Hand-off (14:16, stop-hook loop breaker: 5 red verify runs)
+
+**What's red:** the stop hook's plain `make verify` in the main checkout (`feat/dme-order-intake` @ 90cda1e). The failures change from run to run, with green runs in between (14:15: 101 passed):
+```
+E  sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedTable) relation "users" does not exist
+FAILED tests/test_seed.py::test_rerun_changes_nothing_even_with_new_password - assert (2, 0) == (0, 2)
+FAILED tests/test_orders.py::test_crud_round_trip - assert 401 == 201
+FAILED tests/test_isolation.py::test_each_user_lists_only_their_own - KeyError: 'total'
+ERROR tests/test_orders.py::test_server_owned_keys_rejected[id] - sqlalchemy.exc.IntegrityError: (psycopg.errors.UniqueViolation)
+16 failed, 83 passed, 3 errors in 9.19s
+```
+
+**Diagnosis (high confidence, not proven):** test interference, not a code defect. Every lane, the reviewer agents and the stop hook share one local test DB, `intake_test` on `localhost:55433`, whenever they run pytest without an explicit `TEST_DATABASE_URL`, because the conftest default points there. The schema fixtures drop and recreate tables while another run is mid-test. That explains missing tables, users vanishing (401s), seed counts doubling and unique violations. The same suite is green whenever it runs alone (14:13 and 14:15: 101 passed).
+
+**Tried:**
+1. Separate ports per lane (5451–5454): fixed bind clashes.
+2. Moved the default port off 5433 to 55433: fixed the stop hook's bind clash.
+3. Re-ran in isolation: green.
+
+Agents that run `uv run pytest` directly still land on the shared default DB.
+
+**Suggested next step (small, in scope for M3b or a chore):** make the test DB unique per run. In `services/api/tests/conftest.py`, create `intake_test_<pid>_<random>` at session start from the admin connection and drop it at session end, so no two pytest processes share tables. Then clear the lock with `node ~/.claude/skills/plan/scripts/budget.mjs reset`.
+
+**State of delivery at hand-off:**
+- **Merged:** M1 (#1), M2 (#3), M3a (#2).
+- **In flight:**
+  - M3b (extraction API + deploy): builder running.
+  - M4 (#4): in review.
+- **Live eval:** 100% field accuracy, 0 no-guess violations.
+- **Human:** set `ANTHROPIC_API_KEY` and `SEED_USERS` on Railway.

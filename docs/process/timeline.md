@@ -12,3 +12,4 @@
 | 2026-11-04 13:49 | M1 in PR #1 (live). Plans reconciled with M1. Re-planned into parallel lanes, M5 cut |
 | 2026-11-04 13:52 | Approved and deliver. Wave 1 (M2, M3a, M4) launching |
 | 2026-11-04 13:54 | Wave 1 launched: 3 builders in parallel worktrees (M2 lane A, M3a lane B, M4 lane C) |
+| 2026-11-04 14:13 | M2 (#3) + M3a (#2) merged. Live eval 100% after the schema fix. M4 PR #4 in review. M3b building |
