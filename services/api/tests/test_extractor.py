@@ -5,7 +5,7 @@ from app.extraction.fake import FakeExtractor
 from app.extraction.settings import ExtractionSettings
 
 
-def test_fake_extractor_returns_benchmark_shape():
+def test_ac_m3_1_fake_extractor_returns_benchmark_shape():
     r = FakeExtractor().extract(b"%PDF-", "x.pdf")
     assert set(r.fields) == set(FIELD_NAMES)
     assert r.fields["patient_first_name"].value == "Marie"
@@ -141,3 +141,30 @@ def test_malformed_json_is_extraction_error():
 def test_missing_key_is_not_configured():
     with pytest.raises(ExtractionNotConfigured):
         AnthropicExtractor(ExtractionSettings(_env_file=None))
+
+
+def test_api_error_is_extraction_error():
+    req = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+    exc = anthropic.APIConnectionError(request=req)
+    client = _Client(exc=exc)
+    with pytest.raises(ExtractionError):
+        AnthropicExtractor(_settings(), client).extract(b"x", "a.pdf")
+
+
+def test_no_text_block_is_extraction_error():
+    client = _Client(_msg(None))
+    with pytest.raises(ExtractionError):
+        AnthropicExtractor(_settings(), client).extract(b"x", "a.pdf")
+
+
+def test_client_built_with_no_retries_and_settings_timeout(monkeypatch):
+    seen = {}
+
+    class Spy:
+        def __init__(self, **kw):
+            seen.update(kw)
+
+    monkeypatch.setattr(anthropic, "Anthropic", Spy)
+    AnthropicExtractor(_settings())
+    assert seen["max_retries"] == 0
+    assert seen["timeout"] == 110

@@ -31,7 +31,7 @@ class AnthropicExtractor:
             client = anthropic.Anthropic(
                 api_key=settings.anthropic_api_key.get_secret_value(),
                 timeout=settings.extraction_timeout_s,
-                max_retries=1,
+                max_retries=0,
             )
         self._client = client
 
