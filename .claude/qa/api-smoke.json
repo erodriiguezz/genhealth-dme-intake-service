@@ -1,0 +1,12 @@
+{
+  "checks": [
+    {
+      "name": "GET /health is ok with the DB up",
+      "method": "GET",
+      "url": "/health",
+      "expectStatus": 200,
+      "expectBodyIncludes": "\"db\":\"ok\"",
+      "ac": "AC-M1.1"
+    }
+  ]
+}
