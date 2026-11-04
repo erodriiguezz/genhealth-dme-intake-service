@@ -27,15 +27,17 @@ EXTRACTION_SCHEMA = {
                 "type": "object",
                 "properties": {
                     "name": {"type": "string"},
-                    "role": {"type": ["string", "null"]},
-                    "npi": {"type": ["string", "null"]},
-                    "page": {"type": ["integer", "null"]},
+                    # Non-nullable on purpose: the API allows at most 16 union-typed
+                    # parameters per schema. "" / 0 mean unknown and are mapped to None.
+                    "role": {"type": "string"},
+                    "npi": {"type": "string"},
+                    "page": {"type": "integer"},
                 },
                 "required": ["name", "role", "npi", "page"],
                 "additionalProperties": False,
             },
         },
-        "notes": {"type": ["string", "null"]},
+        "notes": {"type": "string"},  # "" = no notes (see union-type limit above)
     },
     "required": [*FIELD_KEYS, "provider_candidates", "notes"],
     "additionalProperties": False,

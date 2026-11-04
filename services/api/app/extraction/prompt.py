@@ -1,4 +1,4 @@
-PROMPT_VERSION = "2026-11-04.1"
+PROMPT_VERSION = "2026-11-04.2"
 
 SYSTEM_PROMPT = """\
 You extract structured data from a scanned or typed DME (durable medical equipment) \
@@ -22,7 +22,9 @@ evidence.
 
 Fields: patient_first_name, patient_last_name, patient_dob, provider_name (ordering provider, \
 as printed including credentials), provider_npi (ordering provider's NPI, as printed).
-Use notes only for short remarks on legibility or ambiguity; never repeat patient data there.
+In provider_candidates use "" for an unknown role or NPI and 0 for an unknown page.
+Use notes ("" if none) only for short remarks on legibility or ambiguity; \
+never repeat patient data there.
 """
 
 USER_PROMPT = "Extract the fields from the attached order document."

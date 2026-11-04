@@ -92,7 +92,15 @@ class AnthropicExtractor:
 
     def _to_result(self, data: dict, message, latency_ms: int) -> ExtractionResult:
         fields = {k: FieldResult(**(data.get(k) or {})) for k in FIELD_KEYS}
-        candidates = [ProviderCandidate(**c) for c in data.get("provider_candidates") or []]
+        candidates = [
+            ProviderCandidate(
+                name=c["name"],
+                role=c.get("role") or None,
+                npi=c.get("npi") or None,
+                page=c.get("page") or None,
+            )
+            for c in data.get("provider_candidates") or []
+        ]
         usage = message.usage
         return ExtractionResult(
             provider="anthropic",
@@ -103,5 +111,5 @@ class AnthropicExtractor:
             output_tokens=getattr(usage, "output_tokens", None),
             fields=fields,
             provider_candidates=candidates,
-            notes=data.get("notes"),
+            notes=data.get("notes") or None,
         )
