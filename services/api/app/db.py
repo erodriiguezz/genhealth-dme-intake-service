@@ -13,6 +13,7 @@ def get_engine() -> Engine:
     return create_engine(
         s.database_url,
         pool_pre_ping=True,
+        hide_parameters=True,  # SQL params are PHI; keep them out of error text
         connect_args={
             "connect_timeout": max(1, s.health_timeout_ms // 1000),
             "keepalives": 1,
