@@ -96,6 +96,85 @@ make eval       # live extraction eval (~$0.25)
 
 The local Postgres runs on host port **55433**. Override with `DB_PORT=<port>`.
 
+## Hand-off: picking this project up
+
+For a new developer taking over. Read this section, then `docs/architecture/architecture.md`.
+
+### Day one checklist
+1. **Access:** GitHub repo (admin), the Railway project `genhealth-dme-intake` (services `api` + `Postgres`), the Vercel project `genhealth-dme-intake`, and an Anthropic API key of your own.
+2. **Run it locally** (see [Run locally](#run-locally)), then `make verify` (should report ~122 passed) and `make eval` (should report 100% / 0 no-guess violations).
+3. **Walk the product** with [docs/reviews/mvp-order-intake.md](docs/reviews/mvp-order-intake.md), using the test PDFs in `evals/cases/` (expected outcomes in `evals/cases/expected.json`).
+4. **Skim the decisions:** [docs/process/decision-log.md](docs/process/decision-log.md) (D1–D32, one line each, who decided and why) and the ADRs in `docs/context/decisions/`.
+
+### Where things live
+| Area | Path | Notes |
+|---|---|---|
+| HTTP routes | `services/api/app/routers/` | Thin: parse, call a service, serialize. No SQL here |
+| Use cases + owner scoping | `services/api/app/services/` | **Every query filters by `owner_id`.** Keep it that way: other users' rows must look like 404s |
+| Validation rules | `services/api/app/validation/` | Pure functions → `Issue` lists. The easiest place to add a rule |
+| Extraction | `services/api/app/extraction/` | `Extractor` protocol, Anthropic + fake implementations, prompt, JSON schema, grounding |
+| Upload size cap | `services/api/app/upload_limit.py` | ASGI middleware. It runs *before* multipart parsing |
+| DB schema | `docs/architecture/schema.sql` → `services/api/alembic/versions/` | The reviewed DDL is the source of truth. `make schema-diff` proves the migrations match it |
+| Web app | `apps/web/app/`, `apps/web/components/`, `apps/web/lib/api.ts` | Next.js **16**. Read `apps/web/AGENTS.md` first, because its APIs differ from older Next |
+| Tests | `services/api/tests/` (pytest), `e2e/` (Playwright), `evals/` (live model) | |
+| Planning context | `docs/context/` (product, architecture, domain, status tables), `.claude/plans/` | Short tables. Update the row your change makes wrong |
+
+### Common changes
+- **Add an extracted field** (e.g. HCPCS code):
+  1. Add it to `extraction/schema.py`, `prompt.py` and `base.py`.
+  2. Add a column in a new Alembic migration, and mirror it in `schema.sql`.
+  3. Add a validator, and update `schemas.py` + `apps/web/lib/api-types.ts`.
+  4. Add the expected value to the eval cases, then run `make eval`.
+- **Change the prompt:** bump `PROMPT_VERSION` in `extraction/prompt.py`, then run `make eval` and commit `docs/evidence/extraction-eval.*`. Every saved order records the prompt version it was extracted with.
+- **Add a validation rule:** a pure function in `validation/` returning an `Issue`, plus a unit test. `error` blocks `ready`; `warning` doesn't. Status is derived for you. Never set it by hand.
+- **Switch the model or provider:** set the `EXTRACTION_MODEL` env var. A new provider (e.g. AWS Bedrock for HIPAA) is a new `Extractor` implementation registered in `extraction/factory.py`.
+
+### Deploys and environments
+| | Web | API + DB |
+|---|---|---|
+| Host | Vercel, project root **`apps/web`** | Railway: service `api` (Docker, `services/api/Dockerfile`) + `Postgres` |
+| Deploy | Git integration on `main` (needs Root Directory = `apps/web`), or `cd apps/web && vercel deploy --prod` | `cd services/api && railway up --service api` (CLI). There's no Git auto-deploy yet |
+| On start | — | `alembic upgrade head && python -m app.seed && uvicorn …`. Migrations run at container start, which assumes **one replica** (`numReplicas: 1`) |
+| Health | `/login` | `/health` (checks the DB) |
+
+**Environment variables** (secrets live only in the platform dashboards, never in the repo. Templates: `services/api/.env.example`, `apps/web/.env.example`):
+
+| Variable | Where | Purpose |
+|---|---|---|
+| `DATABASE_URL` | Railway api (a reference to Postgres) | DB connection |
+| `ANTHROPIC_API_KEY` | Railway api | Extraction. Without it, upload returns 503 |
+| `JWT_SECRET` | Railway api | Token signing, ≥32 chars in production. Rotating it logs everyone out |
+| `SEED_USERS` | Railway api | `email:pw,email:pw`. Creates missing accounts at start and never changes existing passwords |
+| `ENV` | Railway api | `production` refuses the fake extractor and weak secrets |
+| `EXTRACTION_MODEL` / `EXTRACTION_PROVIDER` | Railway api | `claude-opus-5-5` / `anthropic` |
+| `CORS_ORIGINS` | Railway api | The Vercel URL |
+| `NEXT_PUBLIC_API_URL` | Vercel | The API base URL |
+
+Railway applies dashboard variable edits only after you click **Deploy / Apply changes**.
+
+### Gotchas we already hit
+- **Structured-output schema limit:** the Claude API rejects JSON schemas with more than 16 nullable/union fields (we had 19, and every call returned 400). Mocked tests can't catch this, so run `make eval` after any schema change.
+- **Pre-deploy hooks:** Railway didn't run `preDeployCommand` for CLI deploys, and production had no tables. That's why migrations moved into the container start command.
+- **Local DB port:** the default is 55433 because 5432–5436 are often taken. Each pytest run creates and drops its own throwaway database, so parallel runs are safe.
+- **Fresh checkout typecheck:** Next 16 generates `LayoutProps`, and `make verify` runs `next typegen` before `tsc`.
+- **PHI in logs:** never log field values, filenames or `str(exc)` of DB errors (Postgres puts the row in the error text). The engine uses `hide_parameters=True`, and IntegrityErrors log only the constraint name.
+- **Rate limits are in memory** (register/login 10/min/IP, extract 20/hour/user) and reset on deploy. Back-to-back e2e runs against production can hit 429.
+- **Synchronous extraction:** an upload holds the request for 10–40 s (110 s timeout). Fine at this scale, but see the async design in `docs/context/decisions/2026-11-04-sync-extraction.md`.
+
+### Known gaps (ranked) and what's next
+Full list: [docs/backlog.md](docs/backlog.md).
+1. **HIPAA readiness** before any real PHI: BAAs (Anthropic or Bedrock, plus BAA-covered hosting), an audit log, retention policy. See the HIPAA ADR.
+2. **NPPES lookup:** check that the NPI exists and matches the provider name (B1, ~15 min).
+3. **Async extraction worker** for long faxes and concurrency (B2).
+4. **PDF preview pane** on the review screen, which is web-only on top of `GET /orders/{id}/document` (B9).
+5. **Small items:** password reset and refresh tokens, a Redis rate limiter, S3 for PDFs, a CSP nonce instead of `unsafe-inline`, and a "session expired" message. A PATCH can show both `ungrounded` and `not_found` for one field (cosmetic).
+6. **CI:** there are no GitHub Actions yet. `make verify` + `make schema-diff` + the stubbed Playwright suite are the gate to wire up.
+
+### Ways of working
+- **Branches:** `<type>/<short-description>` (`feat`, `bugfix`, `hotfix`, `chore`, `refactor`). **Commits:** `type: description`, lowercase imperative, one per completed task. PR titles mirror commits.
+- **`main` is production.** Merge only by PR, after `make verify` passes and the PR has a review.
+- **Big changes start with a plan** in `.claude/plans/`: what, why, how, blast radius, acceptance criteria. Record real choices as ADRs in `docs/context/decisions/`.
+
 ## How this was built
 
 Built AI-natively in a 3-hour timebox. A lead agent (Claude Opus) asked the questions, planned and reviewed every PR. Parallel builder agents (Claude Sonnet) wrote the code, one commit per task. The whole trail is in the repo:
