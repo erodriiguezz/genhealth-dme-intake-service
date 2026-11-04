@@ -26,10 +26,16 @@ test("upload shows progress, then the review with all 5 fields and evidence @AC-
   await expect(evidence).toContainText("Prescriber NPI: 9182734556");
   await expect(evidence).toContainText("p.1");
   await expect(page.getByText(/Age|years old/)).toBeVisible();
-  await expect(page.getByText(/Gregory House MD/)).toBeVisible();
+  const main = page.getByRole("main");
+  await expect(main.getByText(/More than one provider appears/)).toBeVisible();
+  const others = main.getByText(/Also on the document:/);
+  await expect(others).toContainText("Gregory House MD, referring physician");
+  await expect(others).toContainText("p.2");
+  await expect(page.getByRole("main").getByText("An NPI starts with 1 or 2.")).toBeVisible();
 
   await expect(page.getByRole("main").getByTestId("status-badge")).toHaveText("Needs review");
-  await expect(page.getByText("1 error must be fixed before this order is ready.")).toBeVisible();
+  await expect(page.getByRole("main").getByText(/errors? must be fixed before this order is ready\./)).toBeVisible();
+  await expect(page.getByRole("main").getByText("2 errors must be fixed before this order is ready.")).toBeVisible();
 });
 
 test("fixing the NPI and saving makes the order ready, and the list agrees @AC-M4.3", async ({ signedIn: page, stub }) => {

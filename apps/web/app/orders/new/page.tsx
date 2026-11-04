@@ -10,7 +10,7 @@ export default function Page() {
   return (
     <PageShell>
       <div>
-        <Link href="/orders" className="text-primary hover:text-[#053DA3] hover:underline">
+        <Link href="/orders" className="text-primary hover:text-primary-hover hover:underline">
           ← Orders
         </Link>
         <h1 className="mt-1 font-title text-[30px] leading-tight">New order</h1>

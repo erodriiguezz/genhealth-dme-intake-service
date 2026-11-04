@@ -15,11 +15,11 @@ import { cn } from "@/lib/utils";
 
 // Shape only. The server decides what is valid and what the status is.
 const schema = z.object({
-  patient_first_name: z.string().max(100, "Too long"),
-  patient_last_name: z.string().max(100, "Too long"),
+  patient_first_name: z.string().max(200, "Too long"),
+  patient_last_name: z.string().max(200, "Too long"),
   patient_dob: z.string().refine((v) => v === "" || /^\d{4}-\d{2}-\d{2}$/.test(v), "Use the format YYYY-MM-DD"),
-  provider_name: z.string().max(200, "Too long"),
-  provider_npi: z.string().max(20, "Too long"),
+  provider_name: z.string().max(300, "Too long"),
+  provider_npi: z.string().max(40, "Too long"),
 });
 type FormValues = z.infer<typeof schema>;
 
@@ -47,9 +47,11 @@ type Props = {
   /** Rendered on the left of the action row, e.g. the delete button. */
   leading?: React.ReactNode;
   formError?: string | null;
+  /** Server-side 422 messages keyed by field. */
+  fieldErrors?: Partial<Record<OrderField, string>>;
 };
 
-export function OrderForm({ order, onSubmit, submitLabel, leading, formError }: Props) {
+export function OrderForm({ order, onSubmit, submitLabel, leading, formError, fieldErrors = {} }: Props) {
   const {
     register,
     handleSubmit,
@@ -67,7 +69,6 @@ export function OrderForm({ order, onSubmit, submitLabel, leading, formError }: 
   const idOf = (f: string) => `${uid}-${f}`;
   const issuesFor = (f: OrderField) => order?.issues.filter((i) => i.field === f) ?? [];
   const candidates = order?.extraction?.provider_candidates ?? [];
-  const hasCandidateIssue = order?.issues.some((i) => i.code === "provider.multiple_candidates") ?? false;
 
   async function submit(values: FormValues) {
     const payload: Partial<OrderValues> = {};
@@ -85,23 +86,24 @@ export function OrderForm({ order, onSubmit, submitLabel, leading, formError }: 
       {ORDER_FIELDS.map((f) => {
         const meta = FIELD_META[f];
         const issues = issuesFor(f);
-        const hasError = issues.some((i) => i.severity === "error") || Boolean(errors[f]);
+        const shapeError = errors[f]?.message ?? fieldErrors[f];
+        const hasError = issues.some((i) => i.severity === "error") || Boolean(shapeError);
         const evidence = order?.extraction?.fields[f];
         const showEvidence = evidence?.evidence && !dirtyFields[f];
         // Dates are normalised by the server, so only compare the free-text fields.
         const edited = f !== "patient_dob" && evidence?.raw != null && (order?.[f] ?? "").replace(/\s/g, "").toLowerCase() !== evidence.raw.replace(/\s/g, "").toLowerCase();
         const describedBy = [
           ...issues.map((_, i) => issueId(f, i, uid)),
-          errors[f] ? idOf(`shape-${f}`) : null,
+          shapeError ? idOf(`shape-${f}`) : null,
           showEvidence ? idOf(`evidence-${f}`) : null,
         ].filter(Boolean).join(" ");
-        const otherCandidates = f === "provider_name" && !hasCandidateIssue
+        const otherCandidates = f === "provider_name"
           ? candidates.filter((c) => c.name !== order?.provider_name)
           : [];
         return (
           <div
             key={f}
-            className={cn("flex flex-col gap-1.5", hasError && "-ml-[15px] border-l-[3px] border-[#C9192E] pl-3")}
+            className={cn("flex flex-col gap-1.5", hasError && "-ml-[15px] border-l-[3px] border-error-border pl-3")}
           >
             <Label htmlFor={idOf(f)}>{meta.label}</Label>
             <Input
@@ -116,13 +118,13 @@ export function OrderForm({ order, onSubmit, submitLabel, leading, formError }: 
                 "h-10 px-3",
                 meta.mono && "font-mono",
                 meta.narrow && "sm:max-w-[240px]",
-                hasError && "border-2 border-[#C9192E]",
+                hasError && "border-2 border-error-border",
               )}
             />
-            {errors[f] && (
+            {shapeError && (
               <p id={idOf(`shape-${f}`)} className="text-[13px] font-medium text-destructive">
                 <span aria-hidden>✕ </span>
-                {errors[f]?.message}
+                {shapeError}
               </p>
             )}
             <FieldIssues field={f} issues={issues} idPrefix={uid} />
@@ -150,7 +152,7 @@ export function OrderForm({ order, onSubmit, submitLabel, leading, formError }: 
       })}
 
       {formError && (
-        <p role="alert" className="rounded-lg border border-[#C9192E] bg-error-bg px-3 py-2 text-sm font-medium text-destructive">
+        <p role="alert" className="rounded-lg border border-error-border bg-error-bg px-3 py-2 text-sm font-medium text-destructive">
           <span aria-hidden>✕ </span>
           {formError}
         </p>

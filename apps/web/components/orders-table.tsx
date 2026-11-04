@@ -59,7 +59,7 @@ export function OrdersView() {
                 "inline-flex h-[34px] items-center rounded-full border px-3 text-sm transition-colors",
                 on
                   ? "border-primary bg-primary font-semibold text-primary-foreground"
-                  : "bg-card text-foreground hover:bg-white/60",
+                  : "bg-card text-foreground hover:bg-card/60",
               )}
             >
               {f.label}
@@ -141,7 +141,7 @@ function OrdersTable({ items }: { items: OrderSummary[] }) {
                 className="cursor-pointer border-t hover:bg-muted/60"
               >
                 <td className="px-4 py-3 font-medium">
-                  <Link href={`/orders/${o.id}`} className="text-primary hover:text-[#053DA3] hover:underline" onClick={(e) => e.stopPropagation()}>
+                  <Link href={`/orders/${o.id}`} className="text-primary hover:text-primary-hover hover:underline" onClick={(e) => e.stopPropagation()}>
                     {name ?? "Unnamed patient"}
                   </Link>
                 </td>

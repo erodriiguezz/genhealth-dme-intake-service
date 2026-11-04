@@ -44,7 +44,7 @@ export function DeleteOrder({ id, label }: { id: string; label: string }) {
       <Button
         type="button"
         variant="outline"
-        className="h-10 border-[#F2A7B0] bg-card px-3.5 text-destructive hover:bg-error-bg"
+        className="h-10 border-error-soft bg-card px-3.5 text-destructive hover:bg-error-bg"
         onClick={() => setOpen(true)}
       >
         Delete order
@@ -67,7 +67,7 @@ export function DeleteOrder({ id, label }: { id: string; label: string }) {
             <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
             <Button
               variant="outline"
-              className="border-[#C9192E] bg-destructive text-white hover:bg-[#8a1022]"
+              className="border-error-border bg-destructive text-white hover:bg-destructive-hover"
               disabled={pending}
               onClick={confirm}
             >

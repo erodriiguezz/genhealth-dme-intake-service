@@ -122,14 +122,14 @@ export function UploadDropzone() {
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         className={`flex flex-col items-center gap-3 rounded-xl border-2 border-dashed bg-card px-6 py-12 text-center transition-colors ${
-          dragging ? "border-primary bg-white" : "border-[#B8BDC9]"
+          dragging ? "border-primary bg-card" : "border-dropzone"
         }`}
       >
         <UploadCloud className="size-10 text-muted-foreground" strokeWidth={1.5} aria-hidden />
         <p className="text-lg font-semibold">Drop a faxed order PDF here</p>
         <p className="text-muted-foreground">PDF only · up to 20 MB · up to 100 pages. Scanned faxes are fine.</p>
         {error && (
-          <div role="alert" className="flex max-w-xl flex-col items-center gap-1 rounded-lg border border-[#C9192E] bg-error-bg px-4 py-3 text-sm font-medium text-destructive">
+          <div role="alert" className="flex max-w-xl flex-col items-center gap-1 rounded-lg border border-error-border bg-error-bg px-4 py-3 text-sm font-medium text-destructive">
             <p><span aria-hidden>✕ </span>{error.message}</p>
             {error.file && <p className="break-all font-mono text-xs font-normal">{error.file.name} · {formatBytes(error.file.size)}</p>}
           </div>

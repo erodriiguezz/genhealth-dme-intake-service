@@ -11,7 +11,7 @@ export function PhiBanner() {
 
 export function SiteFooter() {
   return (
-    <footer className="mx-auto mt-auto w-full max-w-[1200px] border-t border-[#D4D2D8] px-6 py-6 text-xs text-muted-foreground">
+    <footer className="mx-auto mt-auto w-full max-w-[1200px] border-t border-rule px-6 py-6 text-xs text-muted-foreground">
       Take-home project for GenHealth.ai by Ernesto Rodriguez. Not an official GenHealth product.
       Demo data only.
     </footer>

@@ -1,3 +1,4 @@
+import { ORDER_FIELDS, type OrderField } from "./api-types";
 import type {
   ErrorEnvelope,
   Order,
@@ -126,3 +127,16 @@ export const api = {
     return request<Order>("/orders/extract", { method: "POST", body: form });
   },
 };
+
+/** Maps a 422 `details: [{loc, msg}]` onto order fields (the last `loc` segment is the field name). */
+export function fieldErrorsFrom(err: unknown): Partial<Record<OrderField, string>> {
+  const out: Partial<Record<OrderField, string>> = {};
+  if (!(err instanceof ApiError) || err.status !== 422 || !Array.isArray(err.details)) return out;
+  for (const d of err.details as { loc?: unknown[]; msg?: string }[]) {
+    const name = d?.loc?.[d.loc.length - 1];
+    if (typeof name === "string" && (ORDER_FIELDS as string[]).includes(name) && d.msg) {
+      out[name as OrderField] ??= d.msg;
+    }
+  }
+  return out;
+}

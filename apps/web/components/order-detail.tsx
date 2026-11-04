@@ -9,7 +9,7 @@ import { OrderForm } from "@/components/order-form";
 import { StatusBadge } from "@/components/status-badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ApiError, api } from "@/lib/api";
+import { ApiError, api, fieldErrorsFrom } from "@/lib/api";
 import type { Order, OrderValues } from "@/lib/api-types";
 import { patientName } from "@/lib/format";
 import { useApi } from "@/lib/use-api";
@@ -50,28 +50,32 @@ export function OrderDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: order, error, loading, retry, setData } = useApi(`order:${id}`, () => api.getOrder(id));
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<ReturnType<typeof fieldErrorsFrom>>({});
 
   async function save(values: Partial<OrderValues>) {
     setSaveError(null);
+    setFieldErrors({});
     try {
       setData(await api.updateOrder(id, values));
       toast.success("Changes saved");
     } catch (err) {
-      setSaveError(err instanceof ApiError ? err.message : "Couldn't save. Try again.");
+      const fe = fieldErrorsFrom(err);
+      setFieldErrors(fe);
+      setSaveError(Object.keys(fe).length ? "Fix the highlighted fields and save again." : err instanceof ApiError ? err.message : "Couldn't save. Try again.");
     }
   }
 
   return (
     <>
       <div>
-        <Link href="/orders" className="text-primary hover:text-[#053DA3] hover:underline">
+        <Link href="/orders" className="text-primary hover:text-primary-hover hover:underline">
           ← Orders
         </Link>
       </div>
       {error?.status === 404 ? (
         <NotFoundCard />
       ) : error ? (
-        <div role="alert" className="flex flex-wrap items-center gap-3 rounded-lg border border-[#C9192E] bg-error-bg px-4 py-3 text-destructive">
+        <div role="alert" className="flex flex-wrap items-center gap-3 rounded-lg border border-error-border bg-error-bg px-4 py-3 text-destructive">
           Couldn&apos;t load this order. {error.message}
           <button type="button" onClick={retry} className="font-semibold underline">
             Retry
@@ -95,6 +99,7 @@ export function OrderDetail() {
           <OrderBanner order={order} />
           <OrderForm order={order} onSubmit={save} submitLabel="Save changes"
             formError={saveError}
+            fieldErrors={fieldErrors}
             leading={<DeleteOrder id={order.id} label={patientName(order) ?? "This order"} />}
           />
         </section>

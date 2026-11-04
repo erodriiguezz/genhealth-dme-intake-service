@@ -22,8 +22,8 @@ export type StubOrder = {
 const FIELDS = ["patient_first_name", "patient_last_name", "patient_dob", "provider_name", "provider_npi"] as const;
 type Field = (typeof FIELDS)[number];
 
-export function npiValid(n: string) {
-  if (!/^[12]\d{9}$/.test(n)) return false;
+export function npiChecksumOk(n: string) {
+  if (!/^\d{10}$/.test(n)) return false;
   const digits = ("80840" + n.slice(0, 9)).split("").map(Number);
   let sum = 0;
   for (let i = digits.length - 1, k = 0; i >= 0; i--, k++) {
@@ -53,7 +53,10 @@ function revalidate(o: StubOrder, kept: Issue[]) {
       issues.push({ field: f, code: `${f}.not_found`, severity: "error", message: `${LABEL[f]} was not found. Enter it from the source document.`, source: "validation" });
     }
   }
-  if (o.provider_npi && !npiValid(o.provider_npi)) {
+  if (o.provider_npi && !/^[12]/.test(o.provider_npi)) {
+    issues.push({ field: "provider_npi", code: "npi.prefix", severity: "error", message: "An NPI starts with 1 or 2.", source: "validation" });
+  }
+  if (o.provider_npi && !npiChecksumOk(o.provider_npi)) {
     issues.push({ field: "provider_npi", code: "npi.checksum_failed", severity: "error", message: "Fails the NPI checksum. This isn't a valid NPI as written.", source: "validation" });
   }
   if (o.patient_dob) {
@@ -94,7 +97,7 @@ export function benchmarkOrder(id = "11111111-1111-4111-8111-111111111111"): Stu
     updated_at: new Date().toISOString(),
   };
   revalidate(o, [
-    { field: "provider_name", code: "provider.multiple_candidates", severity: "warning", message: "Also on the document: Gregory House MD (referring physician, p.2).", source: "extraction" },
+    { field: "provider_name", code: "provider.multiple_candidates", severity: "warning", message: "More than one provider appears on this document. Confirm the ordering provider.", source: "extraction" },
   ]);
   return o;
 }

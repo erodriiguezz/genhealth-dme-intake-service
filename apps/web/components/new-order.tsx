@@ -5,7 +5,7 @@ import { useState } from "react";
 import { OrderForm } from "@/components/order-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UploadDropzone } from "@/components/upload-dropzone";
-import { ApiError, api } from "@/lib/api";
+import { ApiError, api, fieldErrorsFrom } from "@/lib/api";
 import type { OrderValues } from "@/lib/api-types";
 
 export function NewOrder() {
@@ -13,17 +13,21 @@ export function NewOrder() {
   const initial = useSearchParams().get("tab") === "manual" ? "manual" : "upload";
   const [tab, setTab] = useState<string>(initial);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<ReturnType<typeof fieldErrorsFrom>>({});
   const [formVersion, setFormVersion] = useState(0);
 
   async function create(values: Partial<OrderValues>) {
     setError(null);
+    setFieldErrors({});
     try {
       const order = await api.createOrder(values);
       // The page stays mounted (hidden) after navigating, so clear the draft.
       setFormVersion((v) => v + 1);
       router.push(`/orders/${order.id}`);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Couldn't create the order. Try again.");
+      const fe = fieldErrorsFrom(err);
+      setFieldErrors(fe);
+      setError(Object.keys(fe).length ? "Fix the highlighted fields and try again." : err instanceof ApiError ? err.message : "Couldn't create the order. Try again.");
     }
   }
 
@@ -41,7 +45,7 @@ export function NewOrder() {
           <p className="mb-5 text-sm text-muted-foreground">
             Leave a field empty if it isn&apos;t known. It will be flagged for review.
           </p>
-          <OrderForm key={formVersion} onSubmit={create} submitLabel="Create order" formError={error} />
+          <OrderForm key={formVersion} onSubmit={create} submitLabel="Create order" formError={error} fieldErrors={fieldErrors} />
         </section>
       </TabsContent>
     </Tabs>
