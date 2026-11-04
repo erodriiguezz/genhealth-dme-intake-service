@@ -145,9 +145,9 @@ function OrdersTable({ items }: { items: OrderSummary[] }) {
                     {name ?? "Unnamed patient"}
                   </Link>
                 </td>
-                <td className="px-4 py-3 font-mono text-[13px]">{o.patient_dob ?? <NotFound />}</td>
+                <td className="whitespace-nowrap px-4 py-3 font-mono text-[13px]">{o.patient_dob ?? <NotFound />}</td>
                 <td className="px-4 py-3">{o.provider_name ?? <NotFound />}</td>
-                <td className="px-4 py-3 font-mono text-[13px]">{o.provider_npi ?? <NotFound />}</td>
+                <td className="whitespace-nowrap px-4 py-3 font-mono text-[13px]">{o.provider_npi ?? <NotFound />}</td>
                 <td className="px-4 py-3">
                   <StatusBadge status={o.status} />
                 </td>

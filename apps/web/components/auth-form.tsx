@@ -106,14 +106,14 @@ export function AuthForm({ mode }: { mode: Mode }) {
           {isLogin ? (
             <>
               No account?{" "}
-              <Link href="/signup" className="text-primary underline-offset-2 hover:text-[#053DA3] hover:underline">
+              <Link href="/signup" className="text-primary underline underline-offset-2 hover:text-[#053DA3]">
                 Create one
               </Link>
             </>
           ) : (
             <>
               Have an account?{" "}
-              <Link href="/login" className="text-primary underline-offset-2 hover:text-[#053DA3] hover:underline">
+              <Link href="/login" className="text-primary underline underline-offset-2 hover:text-[#053DA3]">
                 Sign in
               </Link>
             </>

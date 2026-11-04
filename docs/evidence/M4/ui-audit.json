@@ -1,0 +1,51 @@
+{
+  "base": "http://localhost:3002",
+  "at": "2026-11-04T19:10:45.691Z",
+  "passed": true,
+  "serious": 0,
+  "minor": 0,
+  "findings": [],
+  "ignored": [],
+  "screenshots": [
+    {
+      "route": "/login",
+      "viewport": "mobile-320",
+      "file": "/Users/ernesto/Documents/order-intake-service/.claude/worktrees/M4/.claude/design-review/login-mobile-320.png"
+    },
+    {
+      "route": "/login",
+      "viewport": "mobile-390",
+      "file": "/Users/ernesto/Documents/order-intake-service/.claude/worktrees/M4/.claude/design-review/login-mobile-390.png"
+    },
+    {
+      "route": "/login",
+      "viewport": "tablet-768",
+      "file": "/Users/ernesto/Documents/order-intake-service/.claude/worktrees/M4/.claude/design-review/login-tablet-768.png"
+    },
+    {
+      "route": "/login",
+      "viewport": "desktop-1280",
+      "file": "/Users/ernesto/Documents/order-intake-service/.claude/worktrees/M4/.claude/design-review/login-desktop-1280.png"
+    },
+    {
+      "route": "/signup",
+      "viewport": "mobile-320",
+      "file": "/Users/ernesto/Documents/order-intake-service/.claude/worktrees/M4/.claude/design-review/signup-mobile-320.png"
+    },
+    {
+      "route": "/signup",
+      "viewport": "mobile-390",
+      "file": "/Users/ernesto/Documents/order-intake-service/.claude/worktrees/M4/.claude/design-review/signup-mobile-390.png"
+    },
+    {
+      "route": "/signup",
+      "viewport": "tablet-768",
+      "file": "/Users/ernesto/Documents/order-intake-service/.claude/worktrees/M4/.claude/design-review/signup-tablet-768.png"
+    },
+    {
+      "route": "/signup",
+      "viewport": "desktop-1280",
+      "file": "/Users/ernesto/Documents/order-intake-service/.claude/worktrees/M4/.claude/design-review/signup-desktop-1280.png"
+    }
+  ]
+}

@@ -88,6 +88,8 @@ export function OrderForm({ order, onSubmit, submitLabel, leading, formError }: 
         const hasError = issues.some((i) => i.severity === "error") || Boolean(errors[f]);
         const evidence = order?.extraction?.fields[f];
         const showEvidence = evidence?.evidence && !dirtyFields[f];
+        // Dates are normalised by the server, so only compare the free-text fields.
+        const edited = f !== "patient_dob" && evidence?.raw != null && (order?.[f] ?? "").replace(/\s/g, "").toLowerCase() !== evidence.raw.replace(/\s/g, "").toLowerCase();
         const describedBy = [
           ...issues.map((_, i) => issueId(f, i, uid)),
           errors[f] ? idOf(`shape-${f}`) : null,
@@ -99,7 +101,7 @@ export function OrderForm({ order, onSubmit, submitLabel, leading, formError }: 
         return (
           <div
             key={f}
-            className={cn("flex flex-col gap-1.5", hasError && "border-l-[3px] border-[#C9192E] pl-3")}
+            className={cn("flex flex-col gap-1.5", hasError && "-ml-[15px] border-l-[3px] border-[#C9192E] pl-3")}
           >
             <Label htmlFor={idOf(f)}>{meta.label}</Label>
             <Input
@@ -127,7 +129,7 @@ export function OrderForm({ order, onSubmit, submitLabel, leading, formError }: 
             {showEvidence && (
               <p id={idOf(`evidence-${f}`)} data-testid={`evidence-${f}`} className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span>
-                  <span className="sr-only">Evidence: </span>
+                  <span className={edited ? "" : "sr-only"}>{edited ? "Originally read as: " : "Evidence: "}</span>
                   <q className="font-mono">{evidence.evidence}</q>
                 </span>
                 <PageChip page={evidence.page} />
