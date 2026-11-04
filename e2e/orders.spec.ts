@@ -9,7 +9,7 @@ test("manual create, edit and delete @AC-M4.4", async ({ signedIn: page }) => {
   await page.getByRole("main").getByLabel("Ordering provider NPI").fill("1234567893");
   await page.getByRole("button", { name: "Create order" }).click();
 
-  await expect(page).toHaveURL(/\/orders\/[\w-]+$/);
+  await expect(page).toHaveURL(/\/orders\/[0-9a-f]{8}-[0-9a-f-]{27}$/);
   await expect(page.getByRole("main").getByTestId("status-badge")).toHaveText("Ready");
 
   await page.getByRole("link", { name: "← Orders" }).click();
