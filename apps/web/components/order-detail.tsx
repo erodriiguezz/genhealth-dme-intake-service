@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { DeleteOrder } from "@/components/delete-order";
 import { OrderForm } from "@/components/order-form";
 import { StatusBadge } from "@/components/status-badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -92,7 +93,10 @@ export function OrderDetail() {
             <StatusBadge status={order.status} />
           </div>
           <OrderBanner order={order} />
-          <OrderForm order={order} onSubmit={save} submitLabel="Save changes" formError={saveError} />
+          <OrderForm order={order} onSubmit={save} submitLabel="Save changes"
+            formError={saveError}
+            leading={<DeleteOrder id={order.id} label={patientName(order) ?? "This order"} />}
+          />
         </section>
       )}
     </>
