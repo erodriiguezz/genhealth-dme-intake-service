@@ -233,3 +233,10 @@ Agents that run `uv run pytest` directly still land on the shared default DB.
 2. Either approve the lead running the migration and seed on prod, or fix the config and redeploy.
 3. Set `ANTHROPIC_API_KEY` and `SEED_USERS`.
 4. Clear the lock (`budget.mjs reset`) and say "continue". The lead then opens the M3b PR, fixes test-DB isolation, runs M4 against the real API, and runs M6.
+
+**Update, PR #4 (M4) review: request changes** (comment 6639765293):
+- **Blocker F1:** the e2e stub flags NPI 9182734556 with only `npi.checksum_failed`. The real API also adds `npi.prefix`, so "1 error must be fixed" fails under `E2E_REAL_API=1`. Fix the stub and make the assertion count-agnostic.
+- **F2:** the review screen hides the provider-candidates list exactly when `provider.multiple_candidates` fires, and the real warning text doesn't name the other provider. Always show the candidates.
+- **F3:** M4 removed M1's API-health widget and smoke spec (AC-M1.3/M1.6) because `/` now redirects. **The human decides.** The lead recommends retiring those criteria and keeping the API `/health` smoke.
+- **F4:** raw hex colors in order-form instead of tokens.
+- Considers F5–F7 (CSP `unsafe-inline`, zod limits vs. schemas.py, the 401 redirect losing the page): the lead decides once unlocked.
