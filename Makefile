@@ -30,7 +30,7 @@ seed:
 	@echo "seed: added in M2/M3"
 
 eval:
-	@echo "eval: added in M2/M3"
+	cd $(API) && uv run python ../../evals/run_eval.py
 
 fmt:
 	cd $(API) && uv run ruff format . && uv run ruff check --fix .
