@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DME Intake: edge states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;family=Marcellus&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0648C0}a:hover{color:#053DA3}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1180px; box-sizing: border-box; padding: 40px; background: #EEEEF1; color: #0B0D10; font-family: Lexend, system-ui, sans-serif; font-size: 14px; line-height: 1.5; display: flex; gap: 32px">
+
+<div style="flex: 1 1 0; min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-content: start">
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em">Orders: empty</div>
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 40px 24px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.5" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6"></path></svg>
+<div style="font-weight: 600; font-size: 16px">No orders yet</div>
+<div style="color: #475569">Upload a faxed order PDF and we'll pull out the patient and provider details.</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center">
+<button type="button" style="font: inherit; font-weight: 600; height: 40px; padding: 0 14px; border: 0; border-radius: 8px; background: #0648C0; color: #FFFFFF">Upload PDF</button>
+<button type="button" style="font: inherit; font-weight: 500; height: 40px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 8px; background: #FFFFFF; color: #0B0D10">Enter manually</button>
+</div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em">Orders: loading</div>
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 14px" aria-busy="true">
+<div style="height: 12px; width: 40%; background: #E2E8F0; border-radius: 4px"></div>
+<div style="height: 12px; width: 90%; background: #F1F5F9; border-radius: 4px"></div>
+<div style="height: 12px; width: 85%; background: #F1F5F9; border-radius: 4px"></div>
+<div style="height: 12px; width: 88%; background: #F1F5F9; border-radius: 4px"></div>
+<div style="height: 12px; width: 80%; background: #F1F5F9; border-radius: 4px"></div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em">Upload: rejected file</div>
+<div style="background: #FFFFFF; border: 2px dashed #F2A7B0; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+<div style="font-weight: 600">Drop a faxed order PDF here</div>
+<div role="alert" style="color: #A3142A; font-weight: 500">✕ "intake-scan.png" isn't a PDF. Upload a PDF (up to 20 MB).</div>
+<button type="button" style="font: inherit; font-weight: 600; align-self: flex-start; height: 40px; padding: 0 14px; border: 0; border-radius: 8px; background: #0648C0; color: #FFFFFF">Choose another file</button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em">Upload: extraction failed (502)</div>
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+<div role="alert" style="background: #FDE7E9; color: #A3142A; border-radius: 8px; padding: 10px 12px">We couldn't read this document right now. Nothing was saved.</div>
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #475569">referral-0412.fax.pdf · 6 pages · 3.4 MB</div>
+<button type="button" style="font: inherit; font-weight: 600; align-self: flex-start; height: 40px; padding: 0 14px; border: 0; border-radius: 8px; background: #0648C0; color: #FFFFFF">Try again</button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em">Review: field not found (never guessed)</div>
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 6px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Date of birth
+<input value="" placeholder="YYYY-MM-DD" aria-invalid="true" aria-describedby="dob-missing" style="font: inherit; font-weight: 400; height: 40px; padding: 0 12px; border: 2px solid #C9192E; border-radius: 8px; max-width: 220px">
+</label>
+<span id="dob-missing" style="font-size: 13px; font-weight: 500; color: #A3142A">✕ Not found in the document. Enter it from the source or contact the office.</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em">Review: order not found (404)</div>
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 40px 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+<div style="font-weight: 600; font-size: 16px">Order not found</div>
+<div style="color: #475569">It may have been deleted, or it belongs to another account.</div>
+<a href="#" style="font-weight: 600">Back to orders</a>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em">Sign in: bad credentials</div>
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Email<input value="mike@genhealth.ai" style="font: inherit; font-weight: 400; height: 40px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Password<input type="password" value="wrongpass" style="font: inherit; font-weight: 400; height: 40px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px"></label>
+<div role="alert" style="color: #A3142A; font-weight: 500">✕ Email or password is incorrect.</div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em">Delete: confirm dialog</div>
+<div style="background: #0B0D10; border-radius: 12px; padding: 24px; display: flex; justify-content: center">
+<div role="alertdialog" aria-labelledby="del-title" style="background: #FFFFFF; border-radius: 12px; padding: 20px; max-width: 320px; display: flex; flex-direction: column; gap: 12px">
+<div id="del-title" style="font-weight: 600; font-size: 16px">Delete this order?</div>
+<div style="color: #475569">Curie, Marie and its PDF are removed permanently.</div>
+<div style="display: flex; gap: 8px; justify-content: flex-end">
+<button type="button" style="font: inherit; height: 40px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 8px; background: #FFFFFF; color: #0B0D10">Cancel</button>
+<button type="button" style="font: inherit; font-weight: 600; height: 40px; padding: 0 14px; border: 0; border-radius: 8px; background: #A3142A; color: #FFFFFF">Delete</button>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<div style="flex: 0 0 390px; display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em">Review at 390 px: stacked, document collapsed</div>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #EEEEF1; border: 1px solid #CBD5E1; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column">
+<div style="background: #FFE5A3; color: #6B4200; font-size: 12px; text-align: center; padding: 6px 12px">Demo environment. No real patient data.</div>
+<div style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0; height: 52px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between">
+<span style="font-family: Marcellus, Georgia, serif; font-size: 20px">DME Intake</span>
+<button type="button" aria-label="Account menu" style="width: 44px; height: 44px; border: 0; background: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0B0D10" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+</div>
+<div style="padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+<div style="font-family: Marcellus, Georgia, serif; font-size: 22px">Curie, Marie</div>
+<span style="display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; background: #FFE5A3; color: #6B4200; font-weight: 600; font-size: 12px">⚠ Needs review</span>
+</div>
+<button type="button" aria-expanded="false" style="font: inherit; font-weight: 500; height: 44px; border: 1px solid #CBD5E1; border-radius: 8px; background: #FFFFFF; color: #0B0D10">Show document (4 pages)</button>
+<div role="alert" style="background: #FDE7E9; color: #A3142A; border-radius: 8px; padding: 10px 12px">1 error must be fixed before this order is ready.</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Patient first name<input value="Marie" style="font: inherit; font-weight: 400; height: 44px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Patient last name<input value="Curie" style="font: inherit; font-weight: 400; height: 44px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Ordering provider NPI<input value="9182734556" aria-invalid="true" style="font: 400 14px 'JetBrains Mono', monospace; height: 44px; padding: 0 12px; border: 2px solid #C9192E; border-radius: 8px"></label>
+<span style="font-size: 13px; font-weight: 500; color: #A3142A">✕ Fails the NPI checksum.</span>
+<button type="button" style="font: inherit; font-weight: 600; height: 44px; border: 0; border-radius: 8px; background: #0648C0; color: #FFFFFF">Save changes</button>
+</div>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

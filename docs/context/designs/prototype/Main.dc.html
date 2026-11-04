@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DME Intake: clickable flow</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;family=Marcellus&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0648C0}a:hover{color:#053DA3}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #EEEEF1; color: #0B0D10; font-family: Lexend, system-ui, sans-serif; font-size: 14px; line-height: 1.5">
+
+<div style="background: #FFE5A3; color: #6B4200; font-size: 13px; text-align: center; padding: 6px 16px">Demo environment. Do not upload real patient data.</div>
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; justify-content: center; padding: 96px 16px">
+<div style="width: 100%; max-width: 380px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 32px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-family: Marcellus, Georgia, serif; font-size: 28px">DME Intake</div>
+<div style="color: #475569">Sign in to review incoming orders.</div>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Email
+<input type="email" placeholder="you@company.com" style="font: inherit; font-weight: 400; height: 44px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px">
+</label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Password
+<input type="password" placeholder="At least 8 characters" style="font: inherit; font-weight: 400; height: 44px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px">
+</label>
+<button type="button" onClick="{{ signIn }}" style="font: inherit; font-weight: 600; height: 44px; border: 0; border-radius: 8px; background: #0648C0; color: #FFFFFF; cursor: pointer">Sign in</button>
+<div style="color: #475569; text-align: center">No account? <a href="#">Create one</a></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+<header style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0">
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+<button type="button" onClick="{{ goOrders }}" style="font-family: Marcellus, Georgia, serif; font-size: 22px; background: none; border: 0; padding: 0; color: #0B0D10; cursor: pointer">DME Intake</button>
+<div style="display: flex; align-items: center; gap: 16px; color: #475569">
+<span>mahum@genhealth.ai</span>
+<button type="button" onClick="{{ logout }}" style="font: inherit; height: 36px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px; background: #FFFFFF; color: #0B0D10; cursor: pointer">Sign out</button>
+</div>
+</div>
+</header>
+</sc-if>
+
+<sc-if value="{{ isOrders }}" hint-placeholder-val="{{ false }}">
+<main style="max-width: 1200px; margin: 0 auto; padding: 32px 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+<h1 style="margin: 0; font-family: Marcellus, Georgia, serif; font-weight: 400; font-size: 30px">Orders</h1>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<button type="button" onClick="{{ goUpload }}" style="font: inherit; font-weight: 500; height: 40px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 8px; background: #FFFFFF; color: #0B0D10; cursor: pointer">New order</button>
+<button type="button" onClick="{{ goUpload }}" style="font: inherit; font-weight: 600; height: 40px; padding: 0 14px; border: 0; border-radius: 8px; background: #0648C0; color: #FFFFFF; cursor: pointer">Upload PDF</button>
+</div>
+</div>
+<div role="tablist" aria-label="Filter by status" style="display: flex; gap: 4px; flex-wrap: wrap">
+<sc-for list="{{ filters }}" as="f" hint-placeholder-count="3">
+<button type="button" role="tab" aria-selected="{{ f.selected }}" onClick="{{ f.pick }}" style="{{ f.style }}">{{ f.label }}</button>
+</sc-for>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; min-width: 760px">
+<thead>
+<tr style="text-align: left; color: #475569; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em">
+<th style="padding: 12px 16px; font-weight: 600">Patient</th>
+<th style="padding: 12px 16px; font-weight: 600">DOB</th>
+<th style="padding: 12px 16px; font-weight: 600">Ordering provider</th>
+<th style="padding: 12px 16px; font-weight: 600">NPI</th>
+<th style="padding: 12px 16px; font-weight: 600">Status</th>
+<th style="padding: 12px 16px; font-weight: 600">Received</th>
+</tr>
+</thead>
+<tbody>
+<sc-for list="{{ rows }}" as="r" hint-placeholder-count="3">
+<tr style="border-top: 1px solid #E2E8F0">
+<td style="padding: 14px 16px"><button type="button" onClick="{{ r.open }}" style="font: inherit; font-weight: 600; background: none; border: 0; padding: 0; color: #0648C0; cursor: pointer; text-align: left">{{ r.patient }}</button></td>
+<td style="padding: 14px 16px; font-family: 'JetBrains Mono', monospace">{{ r.dob }}</td>
+<td style="padding: 14px 16px">{{ r.provider }}</td>
+<td style="padding: 14px 16px; font-family: 'JetBrains Mono', monospace">{{ r.npi }}</td>
+<td style="padding: 14px 16px"><span style="{{ r.badgeStyle }}">{{ r.badge }}</span></td>
+<td style="padding: 14px 16px; color: #475569">{{ r.received }}</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</main>
+</sc-if>
+
+<sc-if value="{{ isUpload }}" hint-placeholder-val="{{ false }}">
+<main style="max-width: 760px; margin: 0 auto; padding: 32px 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<button type="button" onClick="{{ goOrders }}" style="font: inherit; align-self: flex-start; background: none; border: 0; padding: 0; color: #0648C0; cursor: pointer">← Orders</button>
+<h1 style="margin: 0; font-family: Marcellus, Georgia, serif; font-weight: 400; font-size: 30px">New order</h1>
+</div>
+<div role="tablist" aria-label="Create order" style="display: flex; gap: 4px; border-bottom: 1px solid #E2E8F0">
+<button type="button" role="tab" aria-selected="true" style="font: inherit; font-weight: 600; height: 40px; padding: 0 14px; border: 0; border-bottom: 2px solid #0648C0; background: none; color: #0B0D10">Upload PDF</button>
+<button type="button" role="tab" aria-selected="false" style="font: inherit; height: 40px; padding: 0 14px; border: 0; background: none; color: #475569">Enter manually</button>
+</div>
+<div style="background: #FFFFFF; border: 2px dashed #CBD5E1; border-radius: 12px; padding: 48px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.5" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6"></path><path d="M12 18v-6"></path><path d="M9 15l3-3 3 3"></path></svg>
+<div style="font-weight: 600; font-size: 16px">Drop a faxed order PDF here</div>
+<div style="color: #475569">PDF only · up to 20 MB · up to 100 pages. Scanned faxes are fine.</div>
+<button type="button" onClick="{{ startUpload }}" style="font: inherit; font-weight: 600; height: 44px; padding: 0 18px; border: 0; border-radius: 8px; background: #0648C0; color: #FFFFFF; cursor: pointer">Choose PDF</button>
+</div>
+<div style="color: #475569; font-size: 13px">Extraction reads the patient's name and date of birth and the ordering provider's name and NPI. Anything it can't find or verify is flagged for you. It never guesses.</div>
+</main>
+</sc-if>
+
+<sc-if value="{{ isExtracting }}" hint-placeholder-val="{{ false }}">
+<main style="max-width: 760px; margin: 0 auto; padding: 32px 24px">
+<div role="status" aria-live="polite" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 32px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center; gap: 14px">
+<div aria-hidden="true" style="width: 28px; height: 28px; border-radius: 50%; border: 3px solid #C2D8FC; border-top-color: #0648C0; animation: spin 0.9s linear infinite"></div>
+<div style="display: flex; flex-direction: column">
+<div style="font-weight: 600; font-size: 16px">Reading document… {{ elapsed }}s</div>
+<div style="color: #475569">This usually takes 10–40 seconds for a multi-page fax.</div>
+</div>
+</div>
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #475569">DME Patient Demo Document CPAP.fax.pdf · 4 pages · 1.9 MB</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; gap: 10px; align-items: center"><span style="color: #1F5B12; font-weight: 600" aria-hidden="true">✓</span>Uploaded and checked</div>
+<div style="display: flex; gap: 10px; align-items: center"><span style="color: #0648C0; font-weight: 600" aria-hidden="true">•</span>Extracting patient and provider fields</div>
+<div style="display: flex; gap: 10px; align-items: center; color: #64748B"><span aria-hidden="true">○</span>Validating values against the document</div>
+</div>
+</div>
+</main>
+</sc-if>
+
+<sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+<main style="max-width: 1200px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<button type="button" onClick="{{ goOrders }}" style="font: inherit; align-self: flex-start; background: none; border: 0; padding: 0; color: #0648C0; cursor: pointer">← Orders</button>
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+
+<section aria-label="Source document" style="flex: 1 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap">
+<div style="font-weight: 600">Source document</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<button type="button" aria-label="Previous page" onClick="{{ prevPage }}" style="font: inherit; width: 36px; height: 36px; border: 1px solid #CBD5E1; border-radius: 8px; background: #FFFFFF; cursor: pointer">‹</button>
+<span style="color: #475569; min-width: 92px; text-align: center">Page {{ page }} of 4</span>
+<button type="button" aria-label="Next page" onClick="{{ nextPage }}" style="font: inherit; width: 36px; height: 36px; border: 1px solid #CBD5E1; border-radius: 8px; background: #FFFFFF; cursor: pointer">›</button>
+</div>
+</div>
+<div style="background: #E2E8F0; border-radius: 12px; padding: 16px">
+<div style="background: #FFFFFF; aspect-ratio: 8.5 / 11; box-shadow: 0 1px 3px rgba(15,23,42,0.15); padding: 28px; box-sizing: border-box; font-family: Georgia, serif; font-size: 11px; color: #1E293B; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #475569; text-align: center">FAX SERVER   2/1/2024   4:47:32PM   PAGE {{ page }}/3   FAX SERVER</div>
+<sc-if value="{{ isP1 }}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="text-align: center; font-weight: 700; font-size: 12px">Prescription - Standard Written Order</div>
+<div style="display: flex; justify-content: space-between; gap: 12px">
+<div><div style="font-weight: 700">Patient Name and Address</div><div style="background: #FFE5A3">Marie Curie</div><div>218 Forest Hills Ave</div><div>Boston MA 22180</div></div>
+<div><div style="font-weight: 700">Patient Date of Birth</div><div style="background: #FFE5A3">12/05/1900</div></div>
+</div>
+<div style="display: flex; justify-content: space-between; gap: 12px">
+<div><div style="font-weight: 700">Prescriber Name and Address</div><div style="background: #FFE5A3">Arjun Raj D.P.M</div><div>2121 Pingsten Rd</div><div>Deadham, MA 22109</div></div>
+<div><div><b>Prescriber Phone:</b> 912-219-2310</div><div><b>Prescriber Fax:</b> 912-219-2311</div><div style="outline: 2px solid #C9192E; outline-offset: 1px"><b>Prescriber NPI:</b> 9182734556</div></div>
+</div>
+<div style="font-weight: 700">Diagnosis:</div>
+<div style="display: flex; flex-direction: column; gap: 3px"><div>1. M19.071 Primary osteoarthritis, right ankle and foot</div><div>2. M21.6x1 Other acquired deformities of right foot</div><div>3. M21.6x2 Other acquired deformities of left foot</div></div>
+<div style="height: 8px; background: #F1F5F9"></div>
+<div style="height: 8px; background: #F1F5F9; width: 80%"></div>
+</div>
+</sc-if>
+<sc-if value="{{ isP2 }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="text-align: center; font-weight: 700; font-size: 14px">Clinical Summary</div>
+<div><b>Patient Name:</b> Marie Curie</div>
+<div><b>DOB:</b> 12/05/1900</div>
+<div><b>AGE:</b> 124</div>
+<div style="outline: 2px dashed #64748B; outline-offset: 1px"><b>Referring Physician:</b> Gregory House MD</div>
+<div><b>Visit Date:</b> 02/24/24</div>
+<div style="height: 8px; background: #F1F5F9"></div>
+<div style="height: 8px; background: #F1F5F9; width: 70%"></div>
+</div>
+</sc-if>
+<sc-if value="{{ isP3 }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="height: 8px; background: #F1F5F9"></div>
+<div style="height: 8px; background: #F1F5F9; width: 90%"></div>
+<div style="height: 8px; background: #F1F5F9; width: 75%"></div>
+<div>Completed and Reviewed by: Gregory House MD 02/24/24</div>
+</div>
+</sc-if>
+<sc-if value="{{ isP4 }}" hint-placeholder-val="{{ false }}">
+<div style="color: #64748B; text-align: center; padding-top: 80px">(blank page)</div>
+</sc-if>
+</div>
+</div>
+</section>
+
+<section aria-label="Extracted order" style="flex: 1 1 440px; min-width: 0; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h1 style="margin: 0; font-family: Marcellus, Georgia, serif; font-weight: 400; font-size: 24px">Curie, Marie</h1>
+<div style="color: #475569">From DME Patient Demo Document CPAP.fax.pdf</div>
+</div>
+<span style="{{ badgeStyle }}">{{ badgeLabel }}</span>
+</div>
+<sc-if value="{{ blocked }}" hint-placeholder-val="{{ true }}">
+<div role="alert" style="background: #FDE7E9; color: #A3142A; border-radius: 8px; padding: 10px 12px">1 error must be fixed before this order is ready.</div>
+</sc-if>
+<sc-if value="{{ readyNow }}" hint-placeholder-val="{{ false }}">
+<div role="status" style="background: #EEFBE0; color: #1F5B12; border-radius: 8px; padding: 10px 12px">All fields verified. This order is ready.</div>
+</sc-if>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Patient first name
+<input value="Marie" style="font: inherit; font-weight: 400; height: 40px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px">
+<span style="display: flex; gap: 6px; align-items: center; font-weight: 400; font-size: 12px; color: #475569"><button type="button" onClick="{{ toP1 }}" style="font: 500 11px Lexend, sans-serif; height: 22px; padding: 0 6px; border: 1px solid #CBD5E1; border-radius: 999px; background: #EEEEF1; color: #0648C0; cursor: pointer">p.1</button><span style="font-family: 'JetBrains Mono', monospace">“Marie Curie”</span></span>
+</label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Patient last name
+<input value="Curie" style="font: inherit; font-weight: 400; height: 40px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px">
+<span style="display: flex; gap: 6px; align-items: center; font-weight: 400; font-size: 12px; color: #475569"><button type="button" onClick="{{ toP1 }}" style="font: 500 11px Lexend, sans-serif; height: 22px; padding: 0 6px; border: 1px solid #CBD5E1; border-radius: 999px; background: #EEEEF1; color: #0648C0; cursor: pointer">p.1</button><span style="font-family: 'JetBrains Mono', monospace">“Marie Curie”</span></span>
+</label>
+</div>
+
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Date of birth
+<input value="1900-12-05" style="font: inherit; font-weight: 400; height: 40px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px; max-width: 220px">
+<span style="display: flex; gap: 6px; align-items: center; font-weight: 400; font-size: 12px; color: #475569"><button type="button" onClick="{{ toP1 }}" style="font: 500 11px Lexend, sans-serif; height: 22px; padding: 0 6px; border: 1px solid #CBD5E1; border-radius: 999px; background: #EEEEF1; color: #0648C0; cursor: pointer">p.1</button><span style="font-family: 'JetBrains Mono', monospace">“12/05/1900”</span></span>
+<span style="font-weight: 400; font-size: 13px; color: #6B4200">⚠ Patient would be 124 years old. Check the date (doesn't block ready).</span>
+</label>
+
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Ordering provider name
+<input value="Arjun Raj D.P.M" style="font: inherit; font-weight: 400; height: 40px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px">
+<span style="display: flex; gap: 6px; align-items: center; font-weight: 400; font-size: 12px; color: #475569"><button type="button" onClick="{{ toP1 }}" style="font: 500 11px Lexend, sans-serif; height: 22px; padding: 0 6px; border: 1px solid #CBD5E1; border-radius: 999px; background: #EEEEF1; color: #0648C0; cursor: pointer">p.1</button><span style="font-family: 'JetBrains Mono', monospace">“Prescriber Name and Address Arjun Raj D.P.M”</span></span>
+<span style="display: flex; gap: 6px; align-items: center; font-weight: 400; font-size: 12px; color: #475569">Also on the document: Gregory House MD, referring physician <button type="button" onClick="{{ toP2 }}" style="font: 500 11px Lexend, sans-serif; height: 22px; padding: 0 6px; border: 1px solid #CBD5E1; border-radius: 999px; background: #EEEEF1; color: #0648C0; cursor: pointer">p.2</button></span>
+</label>
+
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Ordering provider NPI
+<input value="{{ draftNpi }}" onInput="{{ setNpi }}" aria-invalid="{{ npiInvalid }}" aria-describedby="npi-issue" inputmode="numeric" style="{{ npiInputStyle }}">
+<span style="display: flex; gap: 6px; align-items: center; font-weight: 400; font-size: 12px; color: #475569"><button type="button" onClick="{{ toP1 }}" style="font: 500 11px Lexend, sans-serif; height: 22px; padding: 0 6px; border: 1px solid #CBD5E1; border-radius: 999px; background: #EEEEF1; color: #0648C0; cursor: pointer">p.1</button><span style="font-family: 'JetBrains Mono', monospace">“Prescriber NPI: 9182734556”</span></span>
+<sc-if value="{{ npiInvalid }}" hint-placeholder-val="{{ true }}">
+<span id="npi-issue" style="font-weight: 500; font-size: 13px; color: #A3142A">✕ Fails the NPI checksum. This isn't a valid NPI as written. Check the source or call the office. (Try 1234567893 in this prototype.)</span>
+</sc-if>
+</label>
+
+<div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-top: 1px solid #E2E8F0; padding-top: 16px">
+<button type="button" style="font: inherit; font-weight: 500; height: 40px; padding: 0 14px; border: 1px solid #F2A7B0; border-radius: 8px; background: #FFFFFF; color: #A3142A; cursor: pointer">Delete order</button>
+<button type="button" onClick="{{ save }}" style="font: inherit; font-weight: 600; height: 40px; padding: 0 18px; border: 0; border-radius: 8px; background: #0648C0; color: #FFFFFF; cursor: pointer">Save changes</button>
+</div>
+</section>
+</div>
+</main>
+</sc-if>
+
+<footer style="max-width: 1200px; margin: 0 auto; padding: 24px; color: #475569; font-size: 12px; border-top: 1px solid #D4D2D8">Take-home project for GenHealth.ai by Ernesto Rodriguez. Not an official GenHealth product. Demo data only.</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { screen: 'login', filter: 'all', elapsed: 0, page: 1, draftNpi: '9182734556', savedNpi: '9182734556' };
+  }
+  componentWillUnmount() { if (this.timer) clearInterval(this.timer); }
+  npiValid(n) {
+    if (!/^[12][0-9]{9}$/.test(n)) return false;
+    var d = ('80840' + n.slice(0, 9)).split('').map(Number);
+    var s = 0;
+    for (var i = d.length - 1, k = 0; i >= 0; i--, k++) {
+      var x = d[i];
+      if (k % 2 === 0) { x = x * 2; if (x > 9) x = x - 9; }
+      s += x;
+    }
+    return (10 - (s % 10)) % 10 === Number(n[9]);
+  }
+  badge(ready) {
+    return ready
+      ? { label: '✓ Ready', style: 'display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; background: #C1F292; color: #1F5B12; font-weight: 600; font-size: 12px; white-space: nowrap' }
+      : { label: '⚠ Needs review', style: 'display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; background: #FFE5A3; color: #6B4200; font-weight: 600; font-size: 12px; white-space: nowrap' };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var curieReady = this.npiValid(st.savedNpi);
+    var b = this.badge(curieReady);
+    var all = [
+      { id: 'curie', patient: 'Curie, Marie', dob: '1900-12-05', provider: 'Arjun Raj D.P.M', npi: st.savedNpi, ready: curieReady, received: 'Today 13:02' },
+      { id: 'doe', patient: 'Doe, Jane', dob: '1961-03-14', provider: 'Ann Lee MD', npi: '1234567893', ready: true, received: 'Today 11:48' },
+      { id: 'okafor', patient: 'Okafor, Daniel', dob: 'Not found', provider: 'Priya Natarajan MD', npi: '1093817465', ready: false, received: 'Yesterday' }
+    ];
+    var rows = all
+      .filter(function (r) { return st.filter === 'all' || (st.filter === 'ready' ? r.ready : !r.ready); })
+      .map(function (r) {
+        var rb = self.badge(r.ready);
+        return Object.assign({}, r, { badge: rb.label, badgeStyle: rb.style, open: function () { self.setState({ screen: 'review', page: 1 }); } });
+      });
+    var tabBase = 'font: inherit; height: 34px; padding: 0 12px; border-radius: 999px; cursor: pointer; ';
+    var filters = [['all', 'All'], ['needs_review', 'Needs review'], ['ready', 'Ready']].map(function (f) {
+      var on = st.filter === f[0];
+      return {
+        label: f[1],
+        selected: on ? 'true' : 'false',
+        style: tabBase + (on ? 'border: 1px solid #0B0D10; background: #0B0D10; color: #FFFFFF; font-weight: 600' : 'border: 1px solid #CBD5E1; background: #FFFFFF; color: #0B0D10'),
+        pick: function () { self.setState({ filter: f[0] }); }
+      };
+    });
+    var npiInvalid = !this.npiValid(st.savedNpi);
+    var go = function (screen) { return function () { self.setState({ screen: screen }); }; };
+    var toPage = function (p) { return function () { self.setState({ page: p }); }; };
+    return {
+      isLogin: st.screen === 'login',
+      isApp: st.screen !== 'login',
+      isOrders: st.screen === 'orders',
+      isUpload: st.screen === 'upload',
+      isExtracting: st.screen === 'extracting',
+      isReview: st.screen === 'review',
+      signIn: go('orders'),
+      logout: go('login'),
+      goOrders: go('orders'),
+      goUpload: go('upload'),
+      startUpload: function () {
+        if (self.timer) clearInterval(self.timer);
+        self.setState({ screen: 'extracting', elapsed: 0 });
+        self.timer = setInterval(function () {
+          var e = self.state.elapsed + 1;
+          if (e >= 5) { clearInterval(self.timer); self.timer = null; self.setState({ screen: 'review', page: 1, elapsed: e }); }
+          else { self.setState({ elapsed: e }); }
+        }, 800);
+      },
+      elapsed: st.elapsed * 3,
+      rows: rows,
+      filters: filters,
+      page: st.page,
+      isP1: st.page === 1, isP2: st.page === 2, isP3: st.page === 3, isP4: st.page === 4,
+      prevPage: function () { self.setState({ page: Math.max(1, st.page - 1) }); },
+      nextPage: function () { self.setState({ page: Math.min(4, st.page + 1) }); },
+      toP1: toPage(1), toP2: toPage(2),
+      draftNpi: st.draftNpi,
+      setNpi: function (ev) { self.setState({ draftNpi: String(ev.target.value).replace(/[^0-9]/g, '').slice(0, 10) }); },
+      save: function () { self.setState({ savedNpi: st.draftNpi }); },
+      npiInvalid: npiInvalid,
+      npiInputStyle: 'font: inherit; font-weight: 400; height: 40px; padding: 0 12px; border-radius: 8px; max-width: 220px; font-family: JetBrains Mono, monospace; ' + (npiInvalid ? 'border: 2px solid #C9192E' : 'border: 1px solid #CBD5E1'),
+      badgeLabel: b.label,
+      badgeStyle: b.style,
+      blocked: !curieReady,
+      readyNow: curieReady
+    };
+  }
+}
+</script>
+</body>
+</html>
