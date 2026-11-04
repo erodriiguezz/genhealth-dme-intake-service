@@ -6,7 +6,12 @@
     "provider_name_contains": "Arjun Raj",
     "provider_npi": "9182734556",
     "pages": 4,
-    "note": "benchmark fax"
+    "note": "benchmark fax",
+    "expected_status": "needs_review",
+    "expected_issues": [
+      "npi.checksum_failed",
+      "dob.age_over_120"
+    ]
   },
   "clean-swo": {
     "patient_first_name": "Jordan",
@@ -15,7 +20,9 @@
     "provider_name_contains": "Dana Whitfield",
     "provider_npi": "1245319599",
     "pages": 1,
-    "note": "clean typed"
+    "note": "clean typed",
+    "expected_status": "ready",
+    "expected_issues": []
   },
   "scanned-fax-noisy": {
     "patient_first_name": "Priya",
@@ -24,25 +31,33 @@
     "provider_name_contains": "Owen Castellanos",
     "provider_npi": "1003000126",
     "pages": 1,
-    "note": "image-only, rotated 2.5 deg, noise"
+    "note": "image-only, rotated 2.5 deg, noise",
+    "expected_status": "ready",
+    "expected_issues": []
   },
   "fields-on-page-3": {
     "patient_first_name": "Lena",
     "patient_last_name": "Okafor",
     "patient_dob": "1985-11-02",
     "provider_name_contains": "Marcus Teller",
-    "provider_npi": "1427019996",
+    "provider_npi": "1427019991",
     "pages": 4,
-    "note": "fields on page 3"
+    "note": "fields on page 3",
+    "expected_status": "ready",
+    "expected_issues": []
   },
   "missing-dob": {
     "patient_first_name": "Samuel",
     "patient_last_name": "Brooks",
     "patient_dob": null,
     "provider_name_contains": "Irene Voss",
-    "provider_npi": "1578451325",
+    "provider_npi": "1578451324",
     "pages": 1,
-    "note": "no DOB, age only"
+    "note": "no DOB, age only",
+    "expected_status": "needs_review",
+    "expected_issues": [
+      "dob.not_found"
+    ]
   },
   "invalid-npi": {
     "patient_first_name": "Hana",
@@ -51,16 +66,22 @@
     "provider_name_contains": "Felix Baptiste",
     "provider_npi": "1234567890",
     "pages": 1,
-    "note": "bad checksum NPI"
+    "note": "bad checksum NPI",
+    "expected_status": "needs_review",
+    "expected_issues": [
+      "npi.checksum_failed"
+    ]
   },
   "referring-distractor": {
     "patient_first_name": "Tobias",
     "patient_last_name": "Lindqvist",
     "patient_dob": "1966-05-09",
     "provider_name_contains": "Nadia Rahman",
-    "provider_npi": "1699780112",
+    "provider_npi": "1699780114",
     "pages": 1,
-    "note": "referring physician must not be chosen"
+    "note": "referring physician must not be chosen",
+    "expected_status": "ready",
+    "expected_issues": []
   },
   "handwritten-style": {
     "patient_first_name": "Rosa",
@@ -69,7 +90,9 @@
     "provider_name_contains": "Kevin Abara",
     "provider_npi": "1740298355",
     "pages": 1,
-    "note": "handwriting-style font, scanned"
+    "note": "handwriting-style font, scanned",
+    "expected_status": "ready",
+    "expected_issues": []
   },
   "injection-no-npi": {
     "patient_first_name": "Gwen",
@@ -78,6 +101,10 @@
     "provider_name_contains": "Paul Nguyen",
     "provider_npi": null,
     "pages": 1,
-    "note": "injection text; NPI absent"
+    "note": "injection text; NPI absent",
+    "expected_status": "needs_review",
+    "expected_issues": [
+      "npi.not_found"
+    ]
   }
 }

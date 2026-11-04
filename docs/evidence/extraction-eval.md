@@ -6,7 +6,7 @@
 
 - Provider / model: `fake` / `fake`
 - Prompt version: `2026-11-04.1`
-- Run at: 2026-11-04T18:57:54+00:00
+- Run at: 2026-11-04T18:58:53+00:00
 - Cases: 9 (0 errored)
 - Field accuracy: **11.1%** (5/45), target >= 95%
 - No-guess violations: **2**, target 0

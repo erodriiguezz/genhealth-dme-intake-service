@@ -23,6 +23,18 @@ HAND = [
 ]
 
 
+def luhn_npi(prefix9: str) -> str:
+    """Append the NPI check digit (Luhn over 80840 + first 9 digits)."""
+    digits = [int(c) for c in "80840" + prefix9]
+    total = 0
+    for i, d in enumerate(reversed(digits)):
+        if i % 2 == 0:
+            d *= 2
+            d = d - 9 if d > 9 else d
+        total += d
+    return prefix9 + str((10 - total % 10) % 10)
+
+
 def font(paths, size):
     for p in paths:
         try:
@@ -141,21 +153,26 @@ def main() -> None:
     # 1 clean typed SWO
     write_text_pdf(
         CASES / "clean-swo.pdf",
-        [swo_page("Jordan Alvarez", "03/14/1962", "Dana Whitfield, MD", "1245319599")],
+        [swo_page("Jordan Alvarez", "03/14/1962", "Dana Whitfield, MD", luhn_npi("124531959"))],
     )
     expected["clean-swo"] = exp(
-        "Jordan", "Alvarez", "1962-03-14", "Dana Whitfield", "1245319599", note="clean typed"
+        "Jordan",
+        "Alvarez",
+        "1962-03-14",
+        "Dana Whitfield",
+        luhn_npi("124531959"),
+        note="clean typed",
     )
 
     # 2 scanned, rotated, noisy fax (image-only)
-    lines = swo_page("Priya Natarajan", "07/22/1978", "Owen Castellanos, MD", "1003000126")
+    lines = swo_page("Priya Natarajan", "07/22/1978", "Owen Castellanos, MD", luhn_npi("100300012"))
     write_image_pdf(CASES / "scanned-fax-noisy.pdf", [render_image(lines, rotate=2.5, noise=True)])
     expected["scanned-fax-noisy"] = exp(
         "Priya",
         "Natarajan",
         "1978-07-22",
         "Owen Castellanos",
-        "1003000126",
+        luhn_npi("100300012"),
         note="image-only, rotated 2.5 deg, noise",
     )
 
@@ -163,12 +180,18 @@ def main() -> None:
     pages = [
         filler("FAX COVER SHEET", "To: Example Medical Supply   Pages: 4   Urgent: no"),
         filler("PROGRESS NOTE", "Patient reports daytime fatigue. See attached sleep study."),
-        swo_page("Lena Okafor", "11/02/1985", "Marcus Teller, DO", "1427019996"),
+        swo_page("Lena Okafor", "11/02/1985", "Marcus Teller, DO", luhn_npi("142701999")),
         filler("INSURANCE INFO", "Plan: Example Health PPO   Member ID: ZX-0099"),
     ]
     write_text_pdf(CASES / "fields-on-page-3.pdf", pages)
     expected["fields-on-page-3"] = exp(
-        "Lena", "Okafor", "1985-11-02", "Marcus Teller", "1427019996", 4, "fields on page 3"
+        "Lena",
+        "Okafor",
+        "1985-11-02",
+        "Marcus Teller",
+        luhn_npi("142701999"),
+        4,
+        "fields on page 3",
     )
 
     # 4 missing DOB (age stated, must not be turned into a DOB)
@@ -176,14 +199,14 @@ def main() -> None:
         "Samuel Brooks",
         "",
         "Irene Voss, MD",
-        "1578451325",
+        luhn_npi("157845132"),
         extra=[
             (100, 460 - 40, "Age: 67 years", "print"),
         ],
     )
     write_text_pdf(CASES / "missing-dob.pdf", [lines])
     expected["missing-dob"] = exp(
-        "Samuel", "Brooks", None, "Irene Voss", "1578451325", note="no DOB, age only"
+        "Samuel", "Brooks", None, "Irene Voss", luhn_npi("157845132"), note="no DOB, age only"
     )
 
     # 5 invalid-checksum NPI (extract verbatim; validators flag it downstream)
@@ -200,9 +223,14 @@ def main() -> None:
         "Tobias Lindqvist",
         "05/09/1966",
         "Nadia Rahman, MD",
-        "1699780112",
+        luhn_npi("169978011"),
         extra=[
-            (100, 1000, "Referring Physician: Walter Pemberton, MD   NPI: 1881945530", "print"),
+            (
+                100,
+                1000,
+                "Referring Physician: Walter Pemberton, MD   NPI: " + luhn_npi("188194553") + "",
+                "print",
+            ),
             (100, 1060, "Referred on 01/10/2025 for sleep evaluation", "print"),
         ],
     )
@@ -212,19 +240,21 @@ def main() -> None:
         "Lindqvist",
         "1966-05-09",
         "Nadia Rahman",
-        "1699780112",
+        luhn_npi("169978011"),
         note="referring physician must not be chosen",
     )
 
     # 7 handwritten-style values, scanned
-    lines = swo_page("Rosa Delgado", "02/18/1954", "Kevin Abara, MD", "1740298355", hand=True)
+    lines = swo_page(
+        "Rosa Delgado", "02/18/1954", "Kevin Abara, MD", luhn_npi("174029835"), hand=True
+    )
     write_image_pdf(CASES / "handwritten-style.pdf", [render_image(lines, rotate=-1.5, noise=True)])
     expected["handwritten-style"] = exp(
         "Rosa",
         "Delgado",
         "1954-02-18",
         "Kevin Abara",
-        "1740298355",
+        luhn_npi("174029835"),
         note="handwriting-style font, scanned",
     )
 
@@ -247,6 +277,16 @@ def main() -> None:
     expected["injection-no-npi"] = exp(
         "Gwen", "Ashby", "1949-12-01", "Paul Nguyen", None, note="injection text; NPI absent"
     )
+
+    # Expected downstream outcome (M3b asserts these): status plus issue codes.
+    outcome = {
+        "genhealth-cpap-fax": ("needs_review", ["npi.checksum_failed", "dob.age_over_120"]),
+        "invalid-npi": ("needs_review", ["npi.checksum_failed"]),
+        "missing-dob": ("needs_review", ["dob.not_found"]),
+        "injection-no-npi": ("needs_review", ["npi.not_found"]),
+    }
+    for name, e in expected.items():
+        e["expected_status"], e["expected_issues"] = outcome.get(name, ("ready", []))
 
     (CASES / "expected.json").write_text(json.dumps(expected, indent=2) + "\n")
     print(f"wrote {len(expected) - 1} synthetic cases to {CASES}")
