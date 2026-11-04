@@ -39,8 +39,8 @@
     "config": "e2e/playwright.config.ts"
   },
   "production": {
-    "webUrl": null,
-    "apiUrl": null
+    "webUrl": "https://genhealth-dme-intake.vercel.app",
+    "apiUrl": "https://api-production-b3c6.up.railway.app"
   },
   "autonomy": {
     "allowMerge": false

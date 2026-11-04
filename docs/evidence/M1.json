@@ -1,0 +1,68 @@
+{
+  "issue": "M1",
+  "date": "2026-11-04",
+  "urls": {
+    "web": "https://genhealth-dme-intake.vercel.app",
+    "api": "https://api-production-b3c6.up.railway.app"
+  },
+  "railway": {
+    "project": "genhealth-dme-intake",
+    "services": [
+      "Postgres (private, no TCP proxy)",
+      "api"
+    ],
+    "DATABASE_URL": "reference to Postgres private URL",
+    "CORS_ORIGINS": "https://genhealth-dme-intake.vercel.app,http://localhost:3000"
+  },
+  "vercel": {
+    "project": "genhealth-dme-intake",
+    "scope": "ernesto-projects (hobby team)",
+    "NEXT_PUBLIC_API_URL": "https://api-production-b3c6.up.railway.app"
+  },
+  "commands": [
+    {
+      "cmd": "make verify",
+      "result": "pass (ruff, format, 6 pytest on intake_test, tsc, eslint)",
+      "ac": [
+        "AC-M1.2",
+        "AC-M1.1",
+        "AC-M1.5"
+      ]
+    },
+    {
+      "cmd": "node ~/.claude/skills/qa/scripts/qa.mjs",
+      "result": "verify/app/api/browser pass; ac-coverage.mjs crashes on non-numeric plan name/AC ids (tooling)",
+      "ac": [
+        "AC-M1.1",
+        "AC-M1.3",
+        "AC-M1.6"
+      ]
+    },
+    {
+      "cmd": "curl https://api-production-b3c6.up.railway.app/health",
+      "result": "200 {\"status\":\"ok\",\"db\":\"ok\"}",
+      "ac": [
+        "AC-M1.4"
+      ]
+    },
+    {
+      "cmd": "BASE_URL=https://genhealth-dme-intake.vercel.app npx playwright test",
+      "result": "5 passed, no console errors in the ok case",
+      "ac": [
+        "AC-M1.4",
+        "AC-M1.6"
+      ]
+    },
+    {
+      "cmd": "curl -H 'Origin: https://evil.example' /health",
+      "result": "no access-control-allow-origin header"
+    }
+  ],
+  "screenshots": [
+    "docs/evidence/M1/local-home-1280.png",
+    "docs/evidence/M1/local-home-390.png",
+    "docs/evidence/M1/prod-home-1280.png",
+    "docs/evidence/M1/prod-home-390.png"
+  ],
+  "leak_check": "git ls-files | grep -iE '(^|/)[.]env' | grep -v '[.]example$' -> empty"
+}

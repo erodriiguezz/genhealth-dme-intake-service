@@ -4,8 +4,8 @@ Upload a physician order, extract the fields, review and edit them. FastAPI + Po
 
 ## Live
 
-- Web: _pending deploy_
-- API: _pending deploy_ (`/health`)
+- Web: https://genhealth-dme-intake.vercel.app
+- API: https://api-production-b3c6.up.railway.app (`/health`)
 
 ## Run locally
 
