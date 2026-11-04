@@ -438,11 +438,9 @@ dependencies = [
     { name = "alembic" },
     { name = "anthropic" },
     { name = "fastapi" },
-    { name = "pillow" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pydantic-settings" },
     { name = "pypdf" },
-    { name = "reportlab" },
     { name = "sqlalchemy" },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -450,7 +448,9 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "httpx" },
+    { name = "pillow" },
     { name = "pytest" },
+    { name = "reportlab" },
     { name = "ruff" },
 ]
 
@@ -459,11 +459,9 @@ requires-dist = [
     { name = "alembic", specifier = ">=1.20.1" },
     { name = "anthropic", specifier = ">=2.4.0" },
     { name = "fastapi", specifier = ">=0.162.0" },
-    { name = "pillow", specifier = ">=13.0.0" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.3.8" },
     { name = "pydantic-settings", specifier = ">=2.16.2" },
     { name = "pypdf", specifier = ">=6.21.4" },
-    { name = "reportlab", specifier = ">=5.1.0" },
     { name = "sqlalchemy", specifier = ">=2.1.8" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.54.0" },
 ]
@@ -471,7 +469,9 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "httpx", specifier = ">=0.28.1" },
+    { name = "pillow", specifier = ">=13.0.0" },
     { name = "pytest", specifier = ">=9.2.0" },
+    { name = "reportlab", specifier = ">=5.1.0" },
     { name = "ruff", specifier = ">=0.17.3" },
 ]
 
