@@ -1,0 +1,337 @@
+{
+  "status": "run",
+  "provider": "fake",
+  "model": "fake",
+  "prompt_version": "2026-11-04.1",
+  "run_at": "2026-11-04T18:58:53+00:00",
+  "cases": 9,
+  "fields_scored": 45,
+  "fields_correct": 5,
+  "field_accuracy": 0.1111,
+  "no_guess_violations": 2,
+  "case_errors": 0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cost_usd_estimate": 0.0,
+  "targets": {
+    "field_accuracy": 0.95,
+    "no_guess_violations": 0
+  },
+  "results": {
+    "genhealth-cpap-fax": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Marie",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Curie",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "12/05/1900",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Arjun Raj D.P.M",
+          "ok": true,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "9182734556",
+          "ok": true,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [
+        "provider.multiple_candidates"
+      ],
+      "latency_ms": 1,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    "clean-swo": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Marie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Curie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "12/05/1900",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Arjun Raj D.P.M",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "9182734556",
+          "ok": false,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [
+        "provider.multiple_candidates"
+      ],
+      "latency_ms": 1,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    "scanned-fax-noisy": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Marie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Curie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "12/05/1900",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Arjun Raj D.P.M",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "9182734556",
+          "ok": false,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [
+        "provider.multiple_candidates"
+      ],
+      "latency_ms": 1,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    "fields-on-page-3": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Marie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Curie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "12/05/1900",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Arjun Raj D.P.M",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "9182734556",
+          "ok": false,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [
+        "provider.multiple_candidates"
+      ],
+      "latency_ms": 1,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    "missing-dob": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Marie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Curie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "12/05/1900",
+          "ok": false,
+          "no_guess_violation": true
+        },
+        "provider_name": {
+          "got": "Arjun Raj D.P.M",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "9182734556",
+          "ok": false,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [
+        "provider.multiple_candidates"
+      ],
+      "latency_ms": 1,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    "invalid-npi": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Marie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Curie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "12/05/1900",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Arjun Raj D.P.M",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "9182734556",
+          "ok": false,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [
+        "provider.multiple_candidates"
+      ],
+      "latency_ms": 1,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    "referring-distractor": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Marie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Curie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "12/05/1900",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Arjun Raj D.P.M",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "9182734556",
+          "ok": false,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [
+        "provider.multiple_candidates"
+      ],
+      "latency_ms": 1,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    "handwritten-style": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Marie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Curie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "12/05/1900",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Arjun Raj D.P.M",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "9182734556",
+          "ok": false,
+          "no_guess_violation": false
+        }
+      },
+      "issues": [
+        "provider.multiple_candidates"
+      ],
+      "latency_ms": 1,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    "injection-no-npi": {
+      "fields": {
+        "patient_first_name": {
+          "got": "Marie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_last_name": {
+          "got": "Curie",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "patient_dob": {
+          "got": "12/05/1900",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_name": {
+          "got": "Arjun Raj D.P.M",
+          "ok": false,
+          "no_guess_violation": false
+        },
+        "provider_npi": {
+          "got": "9182734556",
+          "ok": false,
+          "no_guess_violation": true
+        }
+      },
+      "issues": [
+        "provider.multiple_candidates"
+      ],
+      "latency_ms": 1,
+      "input_tokens": 0,
+      "output_tokens": 0
+    }
+  }
+}
