@@ -5,7 +5,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-DB_PORT="${DB_PORT:-5433}"
+DB_PORT="${DB_PORT:-55433}"
 PSQL=(docker compose exec -T db psql -U intake -v ON_ERROR_STOP=1 -q)
 DUMP=(docker compose exec -T db pg_dump -U intake --schema-only --no-owner --no-privileges
   -T alembic_version)

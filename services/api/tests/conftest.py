@@ -1,7 +1,7 @@
 import os
 
 os.environ["DATABASE_URL"] = os.environ.get(
-    "TEST_DATABASE_URL", "postgresql://intake:intake@localhost:5433/intake_test"
+    "TEST_DATABASE_URL", "postgresql://intake:intake@localhost:55433/intake_test"
 )
 os.environ["ENV"] = "test"
 os.environ["SEED_USERS"] = ""

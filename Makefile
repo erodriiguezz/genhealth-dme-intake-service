@@ -1,6 +1,6 @@
 API := services/api
 WEB := apps/web
-DB_PORT ?= 5433
+DB_PORT ?= 55433
 API_PORT ?= 8000
 WEB_PORT ?= 3000
 export DB_PORT

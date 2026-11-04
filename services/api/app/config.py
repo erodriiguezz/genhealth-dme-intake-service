@@ -11,7 +11,7 @@ SERVICE_DIR = Path(__file__).resolve().parent.parent
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=SERVICE_DIR / ".env", extra="ignore")
 
-    database_url: str = "postgresql+psycopg://intake:intake@localhost:5433/intake"
+    database_url: str = "postgresql+psycopg://intake:intake@localhost:55433/intake"
     cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:3000"]
     health_timeout_ms: int = 2000
     db_tcp_user_timeout_ms: int = 10000
