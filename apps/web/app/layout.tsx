@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Lexend, Marcellus } from "next/font/google";
+import { PhiBanner, SiteFooter } from "@/components/phi-banner";
+import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/lib/auth";
 import "./globals.css";
 
 const lexend = Lexend({ variable: "--font-lexend", subsets: ["latin"] });
@@ -24,7 +27,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${lexend.variable} ${marcellus.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <PhiBanner />
+        <AuthProvider>
+          <div className="flex flex-1 flex-col">{children}</div>
+        </AuthProvider>
+        <SiteFooter />
+        <Toaster position="bottom-right" />
+      </body>
     </html>
   );
 }

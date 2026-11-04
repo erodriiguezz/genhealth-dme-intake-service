@@ -24,13 +24,25 @@ export class ApiError extends Error {
 
 export function getToken(): string | null {
   try {
-    return sessionStorage.getItem(TOKEN_KEY);
+    return sessionStorage.getItem(TOKEN_KEY) ?? memoryToken;
   } catch {
-    return null;
+    return memoryToken;
   }
 }
 
+const tokenListeners = new Set<() => void>();
+export function subscribeToken(listener: () => void) {
+  tokenListeners.add(listener);
+  return () => {
+    tokenListeners.delete(listener);
+  };
+}
+
+let memoryToken: string | null = null;
+
 export function setToken(token: string | null) {
+  memoryToken = token;
+  tokenListeners.forEach((l) => l());
   try {
     if (token) sessionStorage.setItem(TOKEN_KEY, token);
     else sessionStorage.removeItem(TOKEN_KEY);
