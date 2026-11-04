@@ -9,7 +9,7 @@ test("upload shows progress, then the review with all 5 fields and evidence @AC-
   await expect(page.getByText("slow.fax.pdf")).toBeVisible();
   await expect(page.getByText(/Reading document… [1-9]\d*s/)).toBeVisible({ timeout: 10_000 });
 
-  await expect(page).toHaveURL(/\/orders\/[\w-]+$/, { timeout: 20_000 });
+  await expect(page).toHaveURL(/\/orders\/[0-9a-f]{8}-[0-9a-f-]{27}$/, { timeout: 20_000 });
   for (const label of ["Patient first name", "Patient last name", "Date of birth", "Ordering provider name", "Ordering provider NPI"]) {
     await expect(page.getByRole("main").getByLabel(label)).toBeVisible();
   }
@@ -83,7 +83,7 @@ test("a 502 shows an inline error and Try again succeeds @AC-M4.5", async ({ sig
   await expect(alertOf(page)).toContainText("We couldn't read this document right now. Nothing was saved.");
   await expect(page.getByText("referral-502.fax.pdf")).toBeVisible();
   await page.getByRole("button", { name: "Try again" }).click();
-  await expect(page).toHaveURL(/\/orders\/[\w-]+$/);
+  await expect(page).toHaveURL(/\/orders\/[0-9a-f]{8}-[0-9a-f-]{27}$/);
   expect(stub.extractCalls).toBe(2);
 });
 
