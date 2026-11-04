@@ -221,3 +221,15 @@ Agents that run `uv run pytest` directly still land on the shared default DB.
   - M4 (#4): in review.
 - **Live eval:** 100% field accuracy, 0 no-guess violations.
 - **Human:** set `ANTHROPIC_API_KEY` and `SEED_USERS` on Railway.
+
+**Update ~14:20, M3b reported:**
+- Branch `feat/dme-order-intake-p3-extraction-api` is pushed (5f188e3, 49bed7d, ccab0e8, 5ab4703). `make verify` is green on its isolated DB with 120 tests, and schema-diff is clean. **No PR yet.**
+- Deployed to Railway: `/health` is 200, and `/openapi.json` lists the extract and document endpoints.
+- **Production blocker:** register and login return 500. The Railway logs show `relation "users" does not exist`, so migrations never ran against the app's database. Either the pre-deploy hook didn't run, or the api service's `DATABASE_URL` doesn't reference the Railway Postgres service. Locally, the same migration creates all the tables.
+- The builder tried `railway ssh` to run the migration and auto mode denied it as a production action. The lead didn't retry it. **Needs the human.**
+
+**Next steps for the human:**
+1. In Railway, check whether the api deploy's pre-deploy step ran, and that api's `DATABASE_URL` references the Postgres service.
+2. Either approve the lead running the migration and seed on prod, or fix the config and redeploy.
+3. Set `ANTHROPIC_API_KEY` and `SEED_USERS`.
+4. Clear the lock (`budget.mjs reset`) and say "continue". The lead then opens the M3b PR, fixes test-DB isolation, runs M4 against the real API, and runs M6.
