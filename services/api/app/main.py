@@ -5,10 +5,12 @@ from app.config import get_settings
 from app.errors import register_error_handlers
 from app.ratelimit import RateLimiter
 from app.routers import auth, extract, health, orders
+from app.upload_limit import UploadSizeLimit
 
 
 def create_app() -> FastAPI:
     app = FastAPI(title="DME Intake API")
+    app.add_middleware(UploadSizeLimit)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=get_settings().cors_origins,
