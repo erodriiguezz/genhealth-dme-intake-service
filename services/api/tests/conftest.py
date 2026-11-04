@@ -1,7 +1,28 @@
 import os
+import secrets
 
-os.environ["DATABASE_URL"] = os.environ.get(
-    "TEST_DATABASE_URL", "postgresql://intake:intake@localhost:55433/intake_test"
+import psycopg
+from psycopg import sql
+from sqlalchemy.engine import make_url
+
+# One throwaway database per pytest process, so concurrent runs can't drop each other's tables.
+# TEST_DATABASE_URL only supplies the server and credentials.
+_server = make_url(
+    os.environ.get("TEST_DATABASE_URL", "postgresql://intake:intake@localhost:55433/intake_test")
+).set(drivername="postgresql")
+TEST_DB_NAME = f"intake_test_{os.getpid()}_{secrets.token_hex(3)}"
+
+
+def _admin():
+    url = _server.set(database="postgres").render_as_string(hide_password=False)
+    return psycopg.connect(url, autocommit=True)
+
+
+with _admin() as _conn:
+    _conn.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(TEST_DB_NAME)))
+
+os.environ["DATABASE_URL"] = _server.set(database=TEST_DB_NAME).render_as_string(
+    hide_password=False
 )
 os.environ["ENV"] = "test"
 os.environ["SEED_USERS"] = ""
@@ -28,6 +49,11 @@ def migrated_db():
     command.downgrade(cfg, "base")
     command.upgrade(cfg, "head")
     yield
+    get_engine().dispose()
+    with _admin() as conn:
+        conn.execute(
+            sql.SQL("DROP DATABASE IF EXISTS {} WITH (FORCE)").format(sql.Identifier(TEST_DB_NAME))
+        )
 
 
 @pytest.fixture(autouse=True)
