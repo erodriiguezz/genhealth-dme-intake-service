@@ -27,7 +27,7 @@ test("upload shows progress, then the review with all 5 fields and evidence @AC-
   await expect(evidence).toContainText("p.1");
   await expect(page.getByText(/Age|years old/)).toBeVisible();
   const main = page.getByRole("main");
-  await expect(main.getByText(/More than one provider appears/)).toBeVisible();
+  await expect(main.getByText(/names more than one provider/)).toBeVisible();
   const others = main.getByText(/Also on the document:/);
   await expect(others).toContainText("Gregory House MD, referring physician");
   await expect(others).toContainText("p.2");

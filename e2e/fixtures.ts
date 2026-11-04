@@ -37,20 +37,12 @@ export function npiChecksumOk(n: string) {
   return (10 - (sum % 10)) % 10 === Number(n[9]);
 }
 
-const LABEL: Record<Field, string> = {
-  patient_first_name: "Patient first name",
-  patient_last_name: "Patient last name",
-  patient_dob: "Date of birth",
-  provider_name: "Provider name",
-  provider_npi: "Provider NPI",
-};
-
 /** Mirrors the server's re-validation closely enough for the UI specs. */
 function revalidate(o: StubOrder, kept: Issue[]) {
   const issues: Issue[] = [...kept];
   for (const f of FIELDS) {
     if (!o[f]) {
-      issues.push({ field: f, code: `${f}.not_found`, severity: "error", message: `${LABEL[f]} was not found. Enter it from the source document.`, source: "validation" });
+      issues.push({ field: f, code: `${f}.not_found`, severity: "error", message: "Not found. Enter it manually.", source: "validation" });
     }
   }
   if (o.provider_npi && !/^[12]/.test(o.provider_npi)) {
@@ -97,7 +89,7 @@ export function benchmarkOrder(id = "11111111-1111-4111-8111-111111111111"): Stu
     updated_at: new Date().toISOString(),
   };
   revalidate(o, [
-    { field: "provider_name", code: "provider.multiple_candidates", severity: "warning", message: "More than one provider appears on this document. Confirm the ordering provider.", source: "extraction" },
+    { field: "provider_name", code: "provider.multiple_candidates", severity: "warning", message: "The document names more than one provider; confirm the ordering provider.", source: "extraction" },
   ]);
   return o;
 }
