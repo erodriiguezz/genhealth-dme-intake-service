@@ -13,7 +13,14 @@ def get_engine() -> Engine:
     return create_engine(
         s.database_url,
         pool_pre_ping=True,
-        connect_args={"connect_timeout": max(1, s.health_timeout_ms // 1000)},
+        connect_args={
+            "connect_timeout": max(1, s.health_timeout_ms // 1000),
+            "keepalives": 1,
+            "keepalives_idle": 5,
+            "keepalives_interval": 2,
+            "keepalives_count": 2,
+            "tcp_user_timeout": s.health_timeout_ms,
+        },
     )
 
 

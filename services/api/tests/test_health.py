@@ -43,3 +43,27 @@ def test_database_url_normalized(url):
 def test_cors_origins_comma_list():
     s = config.Settings(cors_origins="https://a.app, http://localhost:3000")
     assert s.cors_origins == ["https://a.app", "http://localhost:3000"]
+
+
+def test_cors_origins_trailing_slash_stripped():  # AC-M1.4
+    s = config.Settings(cors_origins="https://a.app/, http://localhost:3000/")
+    assert s.cors_origins == ["https://a.app", "http://localhost:3000"]
+
+
+def test_cors_middleware_allows_only_listed_origins(monkeypatch):  # AC-M1.4
+    from fastapi.testclient import TestClient
+
+    from app.main import create_app
+
+    monkeypatch.setenv("CORS_ORIGINS", "https://ok.app,https://slash.app/")
+    config.get_settings.cache_clear()
+    try:
+        c = TestClient(create_app())
+        ok = c.get("/health", headers={"Origin": "https://ok.app"})
+        slash = c.get("/health", headers={"Origin": "https://slash.app"})
+        bad = c.get("/health", headers={"Origin": "https://evil.app"})
+    finally:
+        config.get_settings.cache_clear()
+    assert ok.headers["access-control-allow-origin"] == "https://ok.app"
+    assert slash.headers["access-control-allow-origin"] == "https://slash.app"
+    assert "access-control-allow-origin" not in bad.headers
