@@ -15,6 +15,8 @@ from sqlalchemy.orm import Session  # noqa: E402
 from alembic import command  # noqa: E402
 from app.db import get_engine  # noqa: E402
 from app.main import create_app  # noqa: E402
+from app.models import User  # noqa: E402
+from app.security import create_access_token, hash_password  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -50,3 +52,21 @@ def app():
 @pytest.fixture
 def client(app):
     return TestClient(app)
+
+
+@pytest.fixture
+def make_user(db):
+    """Insert a user directly (no rate-limited HTTP call). Returns (user, auth headers)."""
+    counter = iter(range(10_000))
+
+    def _make(email: str | None = None, password: str = "correct-horse-9"):
+        user = User(
+            email=email or f"user{next(counter)}@example.com",
+            password_hash=hash_password(password),
+        )
+        db.add(user)
+        db.commit()
+        token, _ = create_access_token(user.id)
+        return user, {"Authorization": f"Bearer {token}"}
+
+    return _make
