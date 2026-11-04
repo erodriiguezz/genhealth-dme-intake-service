@@ -1,6 +1,8 @@
 API := services/api
 WEB := apps/web
 DB_PORT ?= 5433
+API_PORT ?= 8000
+WEB_PORT ?= 3000
 export DB_PORT
 export DATABASE_URL ?= postgresql://intake:intake@localhost:$(DB_PORT)/intake
 TEST_DATABASE_URL ?= postgresql://intake:intake@localhost:$(DB_PORT)/intake_test
@@ -14,8 +16,8 @@ verify:
 
 dev:
 	@trap 'kill 0' INT TERM EXIT; \
-	(cd $(API) && uv run uvicorn app.main:app --reload --port 8000) & \
-	(cd $(WEB) && pnpm dev --port 3000) & \
+	(cd $(API) && CORS_ORIGINS=http://localhost:$(WEB_PORT) uv run uvicorn app.main:app --reload --port $(API_PORT)) & \
+	(cd $(WEB) && NEXT_PUBLIC_API_URL=http://localhost:$(API_PORT) pnpm dev --port $(WEB_PORT)) & \
 	wait
 
 test:

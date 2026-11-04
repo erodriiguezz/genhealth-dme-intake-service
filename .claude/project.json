@@ -5,16 +5,44 @@
   "install": "cd services/api && uv sync && cd ../../apps/web && pnpm install && cd ../../e2e && pnpm install",
   "verify": "make verify",
   "app": {
-    "setup": ["docker compose up -d --wait", "make migrate"],
+    "setup": [
+      "docker compose up -d --wait",
+      "make migrate"
+    ],
     "start": "make dev",
     "stop": "docker compose down",
     "env": {},
-    "health": ["http://localhost:8000/health", "http://localhost:3000/"],
+    "health": [
+      "http://localhost:8000/health",
+      "http://localhost:3000/"
+    ],
     "webUrl": "http://localhost:3000",
     "apiUrl": "http://localhost:8000",
-    "timeoutSec": 180
+    "timeoutSec": 180,
+    "ports": {
+      "web": {
+        "port": 3000,
+        "env": "WEB_PORT"
+      },
+      "api": {
+        "port": 8000,
+        "env": "API_PORT"
+      },
+      "db": {
+        "port": 5433,
+        "env": "DB_PORT"
+      }
+    }
   },
-  "e2e": { "command": "cd e2e && npx --no-install playwright test", "config": "e2e/playwright.config.ts" },
-  "production": { "webUrl": null, "apiUrl": null },
-  "autonomy": { "allowMerge": false }
+  "e2e": {
+    "command": "cd e2e && npx --no-install playwright test",
+    "config": "e2e/playwright.config.ts"
+  },
+  "production": {
+    "webUrl": null,
+    "apiUrl": null
+  },
+  "autonomy": {
+    "allowMerge": false
+  }
 }
