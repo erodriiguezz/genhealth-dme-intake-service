@@ -7,7 +7,7 @@ export DB_PORT
 export DATABASE_URL ?= postgresql://intake:intake@localhost:$(DB_PORT)/intake
 TEST_DATABASE_URL ?= postgresql://intake:intake@localhost:$(DB_PORT)/intake_test
 
-.PHONY: verify dev test migrate seed eval fmt
+.PHONY: verify dev test migrate seed eval fmt schema-diff
 
 verify:
 	docker compose up -d --wait db
@@ -27,7 +27,10 @@ migrate:
 	cd $(API) && uv run alembic upgrade head
 
 seed:
-	@echo "seed: added in M2/M3"
+	cd $(API) && uv run python -m app.seed
+
+schema-diff:
+	./scripts/schema-diff.sh
 
 eval:
 	cd $(API) && uv run python ../../evals/run_eval.py
