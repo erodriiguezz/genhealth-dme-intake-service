@@ -13,11 +13,14 @@ export function NewOrder() {
   const initial = useSearchParams().get("tab") === "manual" ? "manual" : "upload";
   const [tab, setTab] = useState<string>(initial);
   const [error, setError] = useState<string | null>(null);
+  const [formVersion, setFormVersion] = useState(0);
 
   async function create(values: Partial<OrderValues>) {
     setError(null);
     try {
       const order = await api.createOrder(values);
+      // The page stays mounted (hidden) after navigating, so clear the draft.
+      setFormVersion((v) => v + 1);
       router.push(`/orders/${order.id}`);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Couldn't create the order. Try again.");
@@ -38,7 +41,7 @@ export function NewOrder() {
           <p className="mb-5 text-sm text-muted-foreground">
             Leave a field empty if it isn&apos;t known. It will be flagged for review.
           </p>
-          <OrderForm onSubmit={create} submitLabel="Create order" formError={error} />
+          <OrderForm key={formVersion} onSubmit={create} submitLabel="Create order" formError={error} />
         </section>
       </TabsContent>
     </Tabs>

@@ -1,7 +1,7 @@
 import { AlertTriangle, X } from "lucide-react";
 import type { Issue, OrderField } from "@/lib/api-types";
 
-export const issueId = (field: OrderField, i: number) => `issue-${field}-${i}`;
+export const issueId = (field: OrderField, i: number, prefix = "") => `${prefix}issue-${field}-${i}`;
 
 export function PageChip({ page }: { page: number | null }) {
   if (page == null) return null;
@@ -13,7 +13,7 @@ export function PageChip({ page }: { page: number | null }) {
 }
 
 /** Issues for one field. Errors are red with an X, warnings amber with a triangle. */
-export function FieldIssues({ field, issues }: { field: OrderField; issues: Issue[] }) {
+export function FieldIssues({ field, issues, idPrefix = "" }: { field: OrderField; issues: Issue[]; idPrefix?: string }) {
   if (issues.length === 0) return null;
   return (
     <ul className="flex flex-col gap-1">
@@ -22,7 +22,7 @@ export function FieldIssues({ field, issues }: { field: OrderField; issues: Issu
         return (
           <li
             key={`${issue.code}-${i}`}
-            id={issueId(field, i)}
+            id={issueId(field, i, idPrefix)}
             data-severity={issue.severity}
             className={`flex items-start gap-1.5 text-[13px] ${error ? "font-medium text-destructive" : "text-review-fg"}`}
           >

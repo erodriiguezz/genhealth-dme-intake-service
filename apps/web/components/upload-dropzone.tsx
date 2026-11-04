@@ -68,6 +68,8 @@ export function UploadDropzone() {
     setPhase({ kind: "extracting", file });
     try {
       const order = await api.extractOrder(file);
+      // The page stays mounted (hidden) after navigating, so leave it ready for the next upload.
+      setPhase({ kind: "idle" });
       router.push(`/orders/${order.id}`);
     } catch (err) {
       setPhase({ kind: "error", file, ...messageFor(err) });

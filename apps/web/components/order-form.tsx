@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { FieldIssues, PageChip, issueId } from "@/components/issue-list";
@@ -62,6 +62,9 @@ export function OrderForm({ order, onSubmit, submitLabel, leading, formError }: 
     reset(toForm(order));
   }, [order, reset]);
 
+  // Pages stay mounted (hidden) after navigation, so ids must be unique per form instance.
+  const uid = useId();
+  const idOf = (f: string) => `${uid}-${f}`;
   const issuesFor = (f: OrderField) => order?.issues.filter((i) => i.field === f) ?? [];
   const candidates = order?.extraction?.provider_candidates ?? [];
   const hasCandidateIssue = order?.issues.some((i) => i.code === "provider.multiple_candidates") ?? false;
@@ -86,9 +89,9 @@ export function OrderForm({ order, onSubmit, submitLabel, leading, formError }: 
         const evidence = order?.extraction?.fields[f];
         const showEvidence = evidence?.evidence && !dirtyFields[f];
         const describedBy = [
-          ...issues.map((_, i) => issueId(f, i)),
-          errors[f] ? `shape-${f}` : null,
-          showEvidence ? `evidence-${f}` : null,
+          ...issues.map((_, i) => issueId(f, i, uid)),
+          errors[f] ? idOf(`shape-${f}`) : null,
+          showEvidence ? idOf(`evidence-${f}`) : null,
         ].filter(Boolean).join(" ");
         const otherCandidates = f === "provider_name" && !hasCandidateIssue
           ? candidates.filter((c) => c.name !== order?.provider_name)
@@ -98,9 +101,9 @@ export function OrderForm({ order, onSubmit, submitLabel, leading, formError }: 
             key={f}
             className={cn("flex flex-col gap-1.5", hasError && "border-l-[3px] border-[#C9192E] pl-3")}
           >
-            <Label htmlFor={f}>{meta.label}</Label>
+            <Label htmlFor={idOf(f)}>{meta.label}</Label>
             <Input
-              id={f}
+              id={idOf(f)}
               {...register(f)}
               placeholder={meta.placeholder}
               inputMode={meta.numeric ? "numeric" : undefined}
@@ -115,14 +118,14 @@ export function OrderForm({ order, onSubmit, submitLabel, leading, formError }: 
               )}
             />
             {errors[f] && (
-              <p id={`shape-${f}`} className="text-[13px] font-medium text-destructive">
+              <p id={idOf(`shape-${f}`)} className="text-[13px] font-medium text-destructive">
                 <span aria-hidden>✕ </span>
                 {errors[f]?.message}
               </p>
             )}
-            <FieldIssues field={f} issues={issues} />
+            <FieldIssues field={f} issues={issues} idPrefix={uid} />
             {showEvidence && (
-              <p id={`evidence-${f}`} data-testid={`evidence-${f}`} className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <p id={idOf(`evidence-${f}`)} data-testid={`evidence-${f}`} className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span>
                   <span className="sr-only">Evidence: </span>
                   <q className="font-mono">{evidence.evidence}</q>
