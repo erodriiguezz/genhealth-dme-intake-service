@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.errors import ApiError, constraint_name
 from app.models import User
+from app.ratelimit import auth_rate_limit
 from app.schemas import RegisterIn, Token, UserOut
 from app.security import (
     DUMMY_HASH,
@@ -19,7 +20,9 @@ from app.security import (
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/register", status_code=201, response_model=UserOut)
+@router.post(
+    "/register", status_code=201, response_model=UserOut, dependencies=[Depends(auth_rate_limit)]
+)
 def register(body: RegisterIn, db: Session = Depends(get_db)) -> User:
     user = User(email=body.email, password_hash=hash_password(body.password))
     db.add(user)
@@ -33,7 +36,7 @@ def register(body: RegisterIn, db: Session = Depends(get_db)) -> User:
     return user
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=Token, dependencies=[Depends(auth_rate_limit)])
 def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)) -> Token:
     user = db.scalar(select(User).where(User.email == form.username.strip()))
     ok = verify_password(form.password, user.password_hash if user else DUMMY_HASH)

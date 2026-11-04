@@ -66,3 +66,37 @@ def test_me_requires_token(client):
     r = client.get("/auth/me")
     assert r.status_code == 401
     assert r.json()["error"]["code"] == "unauthorized"
+
+
+def test_login_and_register_are_rate_limited_per_ip(client):
+    for _ in range(10):
+        assert login(client, password="wrong-password").status_code == 401
+    r = login(client, password="wrong-password")
+    assert r.status_code == 429
+    assert r.json()["error"]["code"] == "rate_limited"
+    assert int(r.headers["retry-after"]) >= 1
+    assert register(client).status_code == 429  # same IP, same budget
+
+
+def test_rate_limit_is_keyed_by_ip(client):
+    for _ in range(10):
+        login(client, password="x")
+    assert login(client).status_code == 429
+    other = client.post(
+        "/auth/login",
+        data={"username": "a@b.co", "password": "x"},
+        headers={"X-Forwarded-For": "203.0.113.9"},
+    )
+    assert other.status_code == 401
+
+
+def test_rate_limiter_window_expires():
+    from app.ratelimit import RateLimiter
+
+    rl = RateLimiter(limit=2, window_s=0.05)
+    assert rl.check("k") is None and rl.check("k") is None
+    assert rl.check("k") is not None
+    import time
+
+    time.sleep(0.06)
+    assert rl.check("k") is None
