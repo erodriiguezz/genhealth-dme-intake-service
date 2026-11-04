@@ -98,3 +98,27 @@ def test_validate_order_all_missing():
         "provider_name.not_found",
         "provider_npi.not_found",
     ]
+
+
+def test_status_derivation():
+    from app.validation.status import derive_status
+
+    good = {
+        "patient_first_name": "Jane",
+        "patient_last_name": "Doe",
+        "patient_dob": date(1961, 3, 14),
+        "provider_name": "Ann Lee MD",
+        "provider_npi": "1234567893",
+    }
+    assert derive_status(good, validate_order(good, TODAY)) == "ready"
+
+    bad_npi = {**good, "provider_npi": "9182734556"}
+    assert derive_status(bad_npi, validate_order(bad_npi, TODAY)) == "needs_review"
+
+    missing = {**good, "provider_name": None}
+    assert derive_status(missing, validate_order(missing, TODAY)) == "needs_review"
+
+    old = {**good, "patient_dob": date(1900, 12, 5)}
+    issues = validate_order(old, TODAY)
+    assert codes(issues) == ["dob.age_over_120"]
+    assert derive_status(old, issues) == "ready"  # warnings never block
