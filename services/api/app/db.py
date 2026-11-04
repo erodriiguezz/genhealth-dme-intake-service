@@ -19,7 +19,7 @@ def get_engine() -> Engine:
             "keepalives_idle": 5,
             "keepalives_interval": 2,
             "keepalives_count": 2,
-            "tcp_user_timeout": s.health_timeout_ms,
+            "tcp_user_timeout": s.db_tcp_user_timeout_ms,
         },
     )
 
