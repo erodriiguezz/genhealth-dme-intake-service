@@ -1,7 +1,7 @@
 ---
 issue: M4
 title: "Web workflow UI: auth, orders list, upload and review, manual CRUD"
-branch: feat/order-intake-p4-web-ui
+branch: feat/dme-order-intake-p4-web-ui
 status: draft
 approved_by:
 approved_at:
@@ -12,8 +12,8 @@ size: L
 est_tokens: 500000
 est_lines: 800
 shape: single
-feature_branch: feat/order-intake
-base: feat/order-intake
+feature_branch: feat/dme-order-intake
+base: feat/dme-order-intake
 touches_api: false
 tier: high
 queue: false

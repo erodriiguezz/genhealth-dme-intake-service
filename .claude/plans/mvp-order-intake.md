@@ -5,7 +5,7 @@ status: draft
 approved_by:
 approved_at:
 autonomy: pr
-feature_branch: feat/order-intake
+feature_branch: feat/dme-order-intake
 base: main
 repo: existing remote, erodriiguezz/genhealth-dme-intake-service (public, empty); local folder not yet a git repo
 est_tokens: 2400000
@@ -29,7 +29,7 @@ milestones: 6
 - Deep docs: `docs/architecture/{architecture,data-schema,api}.md`
 - History: one commit per completed task, milestone PRs merged without squash
 
-**Milestones** (each one PR into `feat/order-intake` with a commit per task, built, tested against the running app, merge-committed, then the next)
+**Milestones** (each one PR into `feat/dme-order-intake` with a commit per task, built, tested against the running app, merge-committed, then the next)
 | # | Issue | Milestone | Proves | Est. lines |
 | --- | --- | --- | --- | --- |
 | 1 | M1 | scaffold + deploy skeleton | Monorepo boots locally, `/health` green, `make verify` green, Playwright smoke, **API and web already live** on Railway/Vercel | ~450 |
@@ -71,7 +71,7 @@ Full log with every option offered: `docs/process/grill-log.md`. Decisions: `doc
 | 1.3 | Auth | How do users authenticate? | API-owned JWT |
 | 1.4 | Hosting | Where? | Vercel + Railway (overrode Render + Neon) |
 | 2.1 | Timebox | Has it started? | Yes, at 12:13. Hard stop 15:13 |
-| 2.2 | Repo | Visibility and branches? | Public, milestone PRs → `feat/order-intake` → release PR into `main` |
+| 2.2 | Repo | Visibility and branches? | Public, milestone PRs → `feat/dme-order-intake` → release PR into `main` |
 | 2.3 | Frontend | How much? | Review UI + PDF preview |
 | 2.4/2.5 | PDF storage | Keep the PDF? | Yes, for the preview (overrode discard) |
 | 2.6 | Scope cut | Preview scheduling? | Last feature milestone, cut line 14:30 |
@@ -140,7 +140,7 @@ flowchart LR
   - stop: `docker compose down`
 - Verify: `make verify` = ruff check + ruff format --check + pytest (API) + tsc + eslint (web).
 - Tests: API unit/integration in `services/api/tests` (pytest against compose Postgres, Claude mocked via a fake `Extractor`). E2E in `e2e/` (Playwright). Extraction evals in `evals/`, which call live Claude and are run on demand, not in verify.
-- Commits: one conventional commit per completed task (each milestone plan lists its tasks), so `git log` shows the work step by step. Milestone PRs merge into `feat/order-intake` with **merge commits, not squash**, so the task history reaches `main`.
+- Commits: one conventional commit per completed task (each milestone plan lists its tasks), so `git log` shows the work step by step. Milestone PRs merge into `feat/dme-order-intake` with **merge commits, not squash**, so the task history reaches `main`.
 - Deep docs: `docs/architecture/architecture.md`, `data-schema.md`, `api.md`. UI design source: the prototype artifact + `docs/context/designs/`.
 - Secrets: `.env` files gitignored, `.env.example` committed. Logs never contain field values.
 

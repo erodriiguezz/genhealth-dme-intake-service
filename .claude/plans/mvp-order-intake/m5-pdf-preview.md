@@ -1,7 +1,7 @@
 ---
 issue: M5
 title: PDF preview pane on the review screen
-branch: feat/order-intake-p5-pdf-preview
+branch: feat/dme-order-intake-p5-pdf-preview
 status: draft
 approved_by:
 approved_at:
@@ -12,8 +12,8 @@ size: S
 est_tokens: 200000
 est_lines: 250
 shape: single
-feature_branch: feat/order-intake
-base: feat/order-intake
+feature_branch: feat/dme-order-intake
+base: feat/dme-order-intake
 touches_api: false
 tier: high
 queue: false

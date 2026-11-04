@@ -1,7 +1,7 @@
 ---
 issue: M6
 title: End-to-end proof on the deployed app, README and review guide
-branch: feat/order-intake-p6-e2e-docs
+branch: feat/dme-order-intake-p6-e2e-docs
 status: draft
 approved_by:
 approved_at:
@@ -12,8 +12,8 @@ size: M
 est_tokens: 250000
 est_lines: 200
 shape: single
-feature_branch: feat/order-intake
-base: feat/order-intake
+feature_branch: feat/dme-order-intake
+base: feat/dme-order-intake
 touches_api: false
 tier: high
 queue: false

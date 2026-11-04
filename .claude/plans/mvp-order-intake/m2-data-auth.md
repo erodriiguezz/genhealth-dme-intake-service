@@ -1,7 +1,7 @@
 ---
 issue: M2
 title: Users, auth, seeded reviewers and owner-scoped Order CRUD with validation
-branch: feat/order-intake-p2-data-auth
+branch: feat/dme-order-intake-p2-data-auth
 status: draft
 approved_by:
 approved_at:
@@ -12,8 +12,8 @@ size: L
 est_tokens: 450000
 est_lines: 650
 shape: single
-feature_branch: feat/order-intake
-base: feat/order-intake
+feature_branch: feat/dme-order-intake
+base: feat/dme-order-intake
 touches_api: true
 tier: high
 queue: false

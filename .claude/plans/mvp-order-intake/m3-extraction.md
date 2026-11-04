@@ -1,7 +1,7 @@
 ---
 issue: M3
 title: PDF upload and Claude extraction with grounding, validation and eval harness
-branch: feat/order-intake-p3-extraction
+branch: feat/dme-order-intake-p3-extraction
 status: draft
 approved_by:
 approved_at:
@@ -12,8 +12,8 @@ size: L
 est_tokens: 500000
 est_lines: 650
 shape: single
-feature_branch: feat/order-intake
-base: feat/order-intake
+feature_branch: feat/dme-order-intake
+base: feat/dme-order-intake
 touches_api: true
 tier: high
 queue: false

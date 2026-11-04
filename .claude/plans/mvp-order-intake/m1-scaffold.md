@@ -1,7 +1,7 @@
 ---
 issue: M1
 title: Scaffold monorepo, health check and deploy skeleton
-branch: feat/order-intake-p1-scaffold
+branch: feat/dme-order-intake-p1-scaffold
 status: approved
 approved_by: Ernesto
 approved_at: 2026-11-04
@@ -12,8 +12,8 @@ size: M
 est_tokens: 330000
 est_lines: 500
 shape: single
-feature_branch: feat/order-intake
-base: feat/order-intake
+feature_branch: feat/dme-order-intake
+base: feat/dme-order-intake
 touches_api: true
 tier: high
 queue: false
@@ -23,7 +23,7 @@ shaped: 2026-11-04
 # #M1 Scaffold monorepo, health check and deploy skeleton
 
 ## 1. Approval summary
-**What:** The repo is bootstrapped (`main` and `feat/order-intake` on GitHub, with no secret committed). The FastAPI service and the Next.js app boot locally against compose Postgres, `make verify` is green, and both are **already live**: API + private Postgres on Railway, web on Vercel. The web home page checks the API from the browser and shows ok / degraded / unreachable.
+**What:** The repo is bootstrapped (`main` and `feat/dme-order-intake` on GitHub, with no secret committed). The FastAPI service and the Next.js app boot locally against compose Postgres, `make verify` is green, and both are **already live**: API + private Postgres on Railway, web on Vercel. The web home page checks the API from the browser and shows ok / degraded / unreachable.
 
 **Why:** R5 (public URL) is a hard gate, so deploy risk is retired first. A deploy that fails twice is a Hand-off that pauses the MVP chain, about 13:15 instead of 14:55. Every later milestone tests against the running app through `.claude/project.json`.
 
@@ -72,7 +72,7 @@ shaped: 2026-11-04
 - Abuse: secret leak into the public repo. Control: `.gitignore` first, explicit-path staging only (never `git add -A` or `.`), and before **every** push `git ls-files | grep -E '(^|/)\.env($|\.)' | grep -v '\.example$'` must be empty and `git check-ignore .env services/api/.env` must match. Any failure stops the push
 
 **Acceptance criteria**
-- **Repo bootstrap** (AC-M1.0): `.gitignore` is committed first. `main` (docs, plans, .gitignore) and `feat/order-intake` exist on the GitHub remote. `git ls-files` contains no `.env` other than `*.example`, and the leak check passes before each push.
+- **Repo bootstrap** (AC-M1.0): `.gitignore` is committed first. `main` (docs, plans, .gitignore) and `feat/dme-order-intake` exist on the GitHub remote. `git ls-files` contains no `.env` other than `*.example`, and the leak check passes before each push.
 - **Local boot** (AC-M1.1): after `docker compose up -d --wait && make migrate && make dev`, `GET localhost:8000/health` returns `200 {"status":"ok","db":"ok"}`.
 - **DB down** (AC-M1.5): with the DB unreachable or the check timing out after 2 s, `/health` returns `503 {"status":"degraded","db":"down"}`.
 - **Web states** (AC-M1.6): `localhost:3000` shows a loading state, then "API: ok". With `/health` mocked to 503 it shows "API: degraded (db down)", and with the network aborted it shows "API: unreachable".
@@ -94,7 +94,7 @@ Shape mode, 2026-11-04 12:51. Earlier rounds: `docs/process/grill-log.md` (round
 
 | # | Topic | Question | Answer |
 | --- | --- | --- | --- |
-| S1.1 | What | Who creates `main` and `feat/order-intake` (the repo and remote are empty)? | M1 does it → AC-M1.0 |
+| S1.1 | What | Who creates `main` and `feat/dme-order-intake` (the repo and remote are empty)? | M1 does it → AC-M1.0 |
 | S1.2 | What | `/health` when the DB is down? | 503 `{"status":"degraded","db":"down"}` |
 | S1.3 | What | Web status states? | loading / ok / degraded / unreachable |
 | S2.1 | Why | Deploy fails after 2 tries? | Hand-off, the chain stops |
@@ -117,7 +117,7 @@ Assumed without asking: a 2 s DB-check timeout, and the deploy order below.
 
 ## 3. Design & architecture
 ### Approach
-- **Bootstrap order:** `git init -b main` → write `.gitignore` → `git add .gitignore docs .claude/plans` → leak check → commit `chore: bootstrap repo with plans and docs` → add the remote, push `main` → `git switch -c feat/order-intake`, push → `git switch -c feat/order-intake-p1-scaffold`.
+- **Bootstrap order:** `git init -b main` → write `.gitignore` → `git add .gitignore docs .claude/plans` → leak check → commit `chore: bootstrap repo with plans and docs` → add the remote, push `main` → `git switch -c feat/dme-order-intake`, push → `git switch -c feat/dme-order-intake-p1-scaffold`.
 - **Config:** pydantic-settings reads `services/api/.env` locally and platform variables on Railway. Railway's `postgresql://` URL is normalized to `postgresql+psycopg://`. Tests use `TEST_DATABASE_URL` (`intake_test` on 5433).
 - **Health:** `SELECT 1` with `statement_timeout`/connect timeout of 2 s. Any exception → 503 `{"status":"degraded","db":"down"}`. The error is logged without details in the body.
 - **Deploy order** (the API URL is baked into the web build, and the web origin goes into CORS): `railway init -n genhealth-dme-intake` → `railway add -d postgres` → API service from `services/api`, `DATABASE_URL` referenced from the Postgres service (private) → set `JWT_SECRET` (generated inline, not echoed) → `railway up` → `railway domain` → `vercel link` / project `genhealth-dme-intake`, root `apps/web`, set `NEXT_PUBLIC_API_URL` → `vercel deploy --prod` → read the prod alias → set `CORS_ORIGINS=<alias>,http://localhost:3000` on Railway → redeploy the API → curl + Playwright.

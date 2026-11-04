@@ -46,7 +46,7 @@ _Asked 2026-11-04, 12:2x._
 | # | Topic | Question | Options (★ = recommended) | Answer |
 |---|-------|----------|---------------------------|--------|
 | 2.1 | Timebox | Has the 3-hour timebox started? | ★ Starts at build launch · Started at 12:13 | **Started at 12:13**, so the hard stop is 15:13 |
-| 2.2 | Repo | How are the repo and branches set up? | ★ Public, milestone PRs → `feat/order-intake` → one release PR into `main` · Private + zip · Public with `develop` | **Public, main + PRs** |
+| 2.2 | Repo | How are the repo and branches set up? | ★ Public, milestone PRs → `feat/dme-order-intake` → one release PR into `main` · Private + zip · Public with `develop` | **Public, main + PRs** |
 | 2.3 | Frontend | How much frontend? | ★ Thin workflow UI · Review UI + PDF preview (~+45 min) · API + Swagger only | **Review UI + PDF preview** |
 | 2.4 | PDF storage | What happens to the PDF after extraction? | ★ Discard it, keep values + evidence + hash · Store it | **Discard it** |
 
@@ -84,7 +84,7 @@ _Asked 2026-11-04, 12:2x._
 > "Commit throughout the development cycle after completed whole tasks rather than a single commit per milestone. Create separate in-depth documents covering data schemas, API endpoints and architecture. Generate a prototype UI using a Claude artifact to finalize the UI before milestone 4 starts."
 
 **Agent response:**
-1. Every milestone plan gets a numbered task list, and the builder commits after each completed task (conventional messages). The squash into `feat/order-intake` is turned off: milestone PRs are merge commits, so the per-task history survives into `main`.
+1. Every milestone plan gets a numbered task list, and the builder commits after each completed task (conventional messages). The squash into `feat/dme-order-intake` is turned off: milestone PRs are merge commits, so the per-task history survives into `main`.
 2. Three new docs in `docs/architecture/`: `data-schema.md`, `api.md`, `architecture.md`.
 3. The UI prototype is built now as a Claude artifact, so it doesn't stop the autonomous chain mid-run. Once the human signs it off, it becomes M4's design source alongside `docs/context/designs/ui.md`.
 
